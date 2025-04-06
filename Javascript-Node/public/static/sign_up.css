@@ -1,0 +1,128 @@
+/* Sign up page specific styles */
+
+#sign_up_div{
+    margin-left: auto;
+    margin-right: auto;
+
+}
+
+.account_form{
+    text-align: center;
+}
+
+#login_prompt{
+    color: black;
+}
+
+/* General form styling */
+.signup-form {
+    max-width: 400px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    font-family: sans-serif;
+  }
+  
+  /* Form field blocks */
+  .signup-form .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .signup-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  
+  .signup-form input[type="text"],
+  .signup-form input[type="email"],
+  .signup-form input[type="password"] {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 15px;
+    box-sizing: border-box;
+  }
+  
+  /* Toggle switch styling */
+  .toggle-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  
+  .toggle-switch {
+    position: relative;
+    width: 40px;
+    height: 20px;
+  }
+  
+  .toggle-switch input {
+    display: none;
+  }
+  
+  .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0;
+    right: 0; bottom: 0;
+    background-color: #ccc;
+    border-radius: 20px;
+    transition: 0.4s;
+  }
+  
+  .toggle-slider::before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.4s;
+  }
+  
+  .toggle-switch input:checked + .toggle-slider {
+    background-color: #4CAF50;
+  }
+  
+  .toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(20px);
+  }
+  
+  /* Submit button */
+  .signup-form button {
+    width: 100%;
+    padding: 0.8rem;
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  /* Login link */
+  .login-link {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 14px;
+  }
+  
+  .login-link a {
+    color: #4CAF50;
+    text-decoration: none;
+  }
+  
+  .login-link a:hover {
+    text-decoration: underline;
+  }
+  
