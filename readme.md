@@ -45,8 +45,8 @@ Javascript-Node/
 ### 1. Clone or download the project
 
 ```bash
-git clone https://github.com/bryang229/Intro-to-SWE-Volunteer-Matcher
-cd Intro-to-SWE-Volunteer-Matcher/Javascript-Node
+git clone https://github.com/bryang229/Into-to-SWE-Volunteer-Matcher
+cd Into-to-SWE-Volunteer-Matcher/Javascript-Node
 ```
 ### 2. Install Dependencies 
  ```bash
