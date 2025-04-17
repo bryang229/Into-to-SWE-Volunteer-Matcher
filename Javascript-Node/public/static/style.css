@@ -64,4 +64,38 @@ body {
     height: auto;
   }
 
+/* Mobile formatting */
+@media screen and (max-width: 600px) {
+  nav {
+    flex-direction: column;
+    height: auto;
+    text-align: center;
+    padding: 0.5rem;
+  }
 
+  .nav-title {
+    position: static;
+    transform: none;
+    margin-top: 0.5rem;
+    font-size: 18px;
+  }
+
+  .nav-login {
+    font-size: 14px;
+    margin-bottom: 0.5rem;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  .gallery {
+    padding: 20px 10px;
+    gap: 10px;
+  }
+
+  .image-container img {
+    max-width: 100px;
+  }
+}

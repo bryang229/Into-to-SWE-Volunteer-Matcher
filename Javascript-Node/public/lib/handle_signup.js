@@ -38,3 +38,10 @@ signup_form.addEventListener("submit", (e) => {
       });
     
 })
+
+
+//Toggle company only info
+document.getElementById("accountType").addEventListener("change", (e) => {
+  const isCompany = e.target.value === "company";
+  document.getElementById("company-only-fields").style.display = isCompany ? "block" : "none";
+});

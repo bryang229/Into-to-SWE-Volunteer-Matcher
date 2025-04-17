@@ -51,3 +51,62 @@ body {
     font-size: 0.9rem;
     color: #555;
   }
+
+/* Expand formatting below */
+.listing-detail-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.detail-content {
+  background: white;
+  padding: 2rem;
+  max-width: 600px;
+  width: 90%;
+  border-radius: 8px;
+  text-align: left;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+.detail-content button {
+  margin-top: 1rem;
+}
+
+/* Mobile formatting */
+/* Mobile responsiveness for listing cards */
+@media screen and (max-width: 600px) {
+  .listing-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+
+  .listing-card {
+    font-size: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  }
+
+  .listing-content h2 {
+    font-size: 1rem;
+  }
+
+  .listing-content p {
+    font-size: 13px;
+  }
+
+  .listing-card img {
+    height: 150px;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+    padding: 1rem;
+  }
+}

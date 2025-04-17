@@ -2,19 +2,26 @@
 const express = require('express');
 const fs = require("fs");
 const path = require('path');
+const cookieParser = require("cookie-parser");
+const cryptoJS = require('crypto-js');
 
 //Setting up app
 const app = express(); // Creating app object
 app.use(express.static(path.join(__dirname, '../public'))); //Connecting frontend
 app.use(express.json());
 
-const dataFile = path.join(__dirname, "demo_data.json"); //Creating json path
+const dataFile = path.join(__dirname, "demo_data_expanded.json"); //Creating json path
 
 //Loading fresh data on request (DEMO MODE)
 const loadData = () => {
   const raw = fs.readFileSync(dataFile); // Reading file JSON DB (only for DEMO)
   return JSON.parse(raw);
 };
+
+//Redirects root route to home page
+app.get('/', (req, res) => {
+  res.redirect('/templates/index.html'); // Redirect to the desired static page
+});
 
 //GET all volunteers
 app.get('/api/volunteers', (req, res) => {
@@ -56,6 +63,13 @@ app.post('/api/register', (req, res) => {
   fs.writeFileSync(dataFile, JSON.stringify(data, null, 2));
   res.json({ message: "User added", user: newUser });
 });
+
+app.post('/api/login', (req, res) => {
+  const data = loadData();
+  const userData = req.body;
+  // is
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
