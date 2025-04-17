@@ -188,3 +188,24 @@
     margin-top: 0.25rem;
   }
 }
+
+.feedback-message {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+/* username check feedback */
+.feedback-message.success {
+  color: green;
+}
+
+.feedback-message.error {
+  color: red;
+}
+
+.feedback-message.warning {
+  color: orange;
+}

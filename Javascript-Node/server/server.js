@@ -1,22 +1,16 @@
 // Importing dependencies 
 const express = require('express');
-const fs = require("fs");
 const path = require('path');
-const cookieParser = require("cookie-parser");
-const cryptoJS = require('crypto-js');
+const { db } = require("./firebase"); //Loads firebase.js to authenticate our session using our key
+const cryptoJS = require("crypto-js");
+//Cookies not implemented yet
+// const cookieParser = require("cookie-parser");
 
 //Setting up app
 const app = express(); // Creating app object
 app.use(express.static(path.join(__dirname, '../public'))); //Connecting frontend
 app.use(express.json());
-
-const dataFile = path.join(__dirname, "demo_data_expanded.json"); //Creating json path
-
-//Loading fresh data on request (DEMO MODE)
-const loadData = () => {
-  const raw = fs.readFileSync(dataFile); // Reading file JSON DB (only for DEMO)
-  return JSON.parse(raw);
-};
+// app.use(cookieParser)
 
 //Redirects root route to home page
 app.get('/', (req, res) => {
@@ -24,53 +18,161 @@ app.get('/', (req, res) => {
 });
 
 //GET all volunteers
-app.get('/api/volunteers', (req, res) => {
-  const data = loadData();
-  res.json(data.volunteers);
+app.get('/api/volunteers', async (req, res) => {
+  try {
+    const snapshot = await db.collection('Volunteers').get();
+    const volunteers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    res.json(volunteers);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+    console.error(err);
+  }
 });
 
 //GET all companies
-app.get('/api/companies', (req, res) => {
-  const data = loadData();
-  res.json(data.companies);
+app.get('/api/companies', async (req, res) => {
+  try {
+    const snapshot = await db.collection('Company').get();
+    const companies = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    res.json(companies);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+    console.error(err);
+  }
 });
 
 //GET all listings
-app.get("/api/listings", (req, res) => {
-  const data = loadData();
-  res.json(data.listings);
+app.get("/api/listings", async (req, res) => {
+  console.log("get listings called -> debug only");
+  try {
+    const snapshot = await db.collection('Listings').get();
+    const listings = snapshot.empty ? [] :
+  snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    res.json(listings);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+    console.error(err);
+  }
 });
 
 //GET specific volunteer by username
-app.get("/api/volunteers/:username", (req, res) => {
-  const { username } = req.params;
-  const data = loadData();
-  const user = data.volunteers.find(v => v.username === username);
-  if (user) res.json(user);
-  else res.status(404).json({ error: "Volunteer not found" });
+app.get("/api/volunteers/:username", async (req, res) => {
+  try {
+    const { username } = req.params;
+    const snapshot = await db.collection('Volunteers')
+                             .where("username", "==", username)
+                             .get();
+
+    if (snapshot.empty) {
+      return res.status(404).json({ error: "Volunteer not found" });
+    }
+
+    const doc = snapshot.docs[0];
+    res.json({ id: doc.id, ...doc.data() });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Check if a username is already taken
+app.get('/api/check-username', async (req, res) => {
+  const { username } = req.query;
+
+  if (!username || username.trim() === "") {
+    return res.status(400).json({ error: "Username is required" });
+  }
+
+  try {
+    const snapshot = await db.collection("Volunteers")
+                             .where("username", "==", username)
+                             .limit(1)
+                             .get();
+
+    if (!snapshot.empty) {
+      return res.json({ available: false });
+    }
+
+    res.json({ available: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // POST new user
-app.post('/api/register', (req, res) => {
-  console.log(req.body); 
-  const data = loadData();
-  const newUser = req.body;
-  data.volunteers.push(newUser);
+app.post('/api/register/volunteer', async (req, res) => {
+  const { username, fullname, email, password } = req.body;
 
-  //TODO: verify new user
+  try {
+    // Check for duplicate usernames
+    const existingUserSnap = await db.collection('Volunteers')
+                                     .where("username", "==", username)
+                                     .get();
 
-  // Just write back to file (NOT recommended for prod)
-  fs.writeFileSync(dataFile, JSON.stringify(data, null, 2));
-  res.json({ message: "User added", user: newUser });
+    if (!existingUserSnap.empty) {
+      return res.status(409).json({ error: "Username already exists" });
+    }
+
+    // Hash sensitive info
+    const hashedEmail = cryptoJS.SHA256(email).toString();
+    const hashedPassword = cryptoJS.SHA256(password).toString();
+
+    const volunteerData = {
+      username,
+      fullname,
+      hashedEmail,
+      hashedPassword,
+      // The rest can be filled out later
+    };
+
+    const ref = await db.collection("Volunteers").add(volunteerData);
+    res.status(201).json({ message: "Volunteer registered", id: ref.id });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-app.post('/api/login', (req, res) => {
-  const data = loadData();
-  const userData = req.body;
-  // is
+//Company register
+app.post("/api/register/company", async (req, res) => {
+  const { uid, email, companyName, admin_fullname, username, publicEmail, privateEmail, companyBio } = req.body;
+
+  try {
+    // Check for duplicate username
+    const existingUserSnap = await db.collection("companies")
+                                     .where("username", "==", username)
+                                     .get();
+
+    if (!existingUserSnap.empty) {
+      return res.status(409).json({ error: "Username already exists" });
+    }
+
+    const companyData = {
+      companyName,
+      admin_fullname,
+      username,
+      publicEmail: publicEmail || null,
+      privateEmail: privateEmail || null,
+      companyBio: companyBio || "",
+      hashedEmail: cryptoJS.SHA256(email).toString(),
+      createdAt: new Date()
+    };
+
+    await db.collection("companies").doc(uid).set(companyData);
+
+    res.status(201).json({ message: "Company registered", uid });
+  } catch (err) {
+    console.error("Error registering company:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
+
+//not implemented
+// app.post('/api/login', (req, res) => {
+
+//   // is
+// });
 
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
+

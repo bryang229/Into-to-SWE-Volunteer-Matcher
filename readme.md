@@ -34,8 +34,19 @@ Javascript-Node/
         ├── sign_up.html # Sign up page, functional, hashes data
 ├── server/              # Backend code and data
 │   ├── server.js        # Main Express server
-│   ├── demo_data.json   # Mock “database”
+    ├── firebase.js             # Firebase Admin SDK config lives here
+    ├── routes/
+    │   ├── authRoutes.js       # Routes like signup/login
+    │   ├── volunteerRoutes.js  # Protected routes for volunteers
+    │   └── companyRoutes.js  
+    ├── controllers/
+│       └── userController.js   # Business logic, like createProfile, etc. 
 ├── package.json         # Project config & scripts
+├── secrets/
+│   └── serviceAccountKey.json
+├── .env
+├── node_modules/
+├── .gitignore 
 └── README.md            # This file
 ```
 

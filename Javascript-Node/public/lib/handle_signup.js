@@ -1,47 +1,45 @@
-let signup_form = document.querySelector(".signup-form");
+import { auth, createUserWithEmailAndPassword } from './firebase-config.js';
 
-signup_form.addEventListener("submit", (e) => {
-    e.preventDefault();
+export async function registerVolunteer(email, password, username, fullname) {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const uid = userCredential.user.uid;
+    const emailHash = CryptoJS.SHA256(email).toString();
 
-    let name = document.getElementById("fullname");
-    let username = document.getElementById("username");
-    let email = document.getElementById("email");
-    let password = document.getElementById("password");
-    
-    //Getting names from form using DOM 
-    let fullname = name.value;
-    let username_raw_txt = username.value;
-    let email_raw_txt = email.value;
-    let password_raw_txt = password.value;
+    const res = await fetch("/api/register/volunteer", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ uid, username, fullname, email: emailHash })
+    });
 
-    //HASHING DATA
-    let username_hash = CryptoJS.SHA256(username_raw_txt).toString();
-    let email_hash = CryptoJS.SHA256(email_raw_txt).toString();
-    let password_raw_hash = CryptoJS.SHA256(password_raw_txt).toString();
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Unknown error");
 
-    console.log(fullname);
-    console.log(username_hash);
+    return { success: true, uid };
+  } catch (err) {
+    console.error("Signup error:", err);
+    return { success: false, message: err.message };
+  }
+}
 
-    // Format data to send to backend for processing
-    const data = {
-        fullname: fullname,
-        usernameHash: username_hash,
-        emailHash: email_hash,
-        passwordHash: password_raw_hash // NOT safe yet!
-      };
-      
-      // Send `data` to backend
-      fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-    
-})
+export async function registerCompany(email, password, companyData) {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const uid = userCredential.user.uid;
+    const emailHash = CryptoJS.SHA256(email).toString();
 
+    const res = await fetch("/api/register/company", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ uid, email: emailHash, ...companyData })
+    });
 
-//Toggle company only info
-document.getElementById("accountType").addEventListener("change", (e) => {
-  const isCompany = e.target.value === "company";
-  document.getElementById("company-only-fields").style.display = isCompany ? "block" : "none";
-});
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Unknown error");
+
+    return { success: true, uid };
+  } catch (err) {
+    console.error("Signup error:", err);
+    return { success: false, message: err.message };
+  }
+}
