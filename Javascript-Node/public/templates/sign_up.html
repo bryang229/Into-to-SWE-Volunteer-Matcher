@@ -6,11 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My JavaScript Web App</title>
   <link rel="stylesheet" href="../static/style.css" />
-  <link rel="stylesheet" href="../static/sign_up.css" />
+  <link rel="stylesheet" href="../static/register_login.css" />
 
-  <!-- Importing CryptoJS using a CDN so that we can hash sensitive data -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" defer></script>
-  <script src="../lib/handle_signup.js" defer></script>
 
 </head>
 
@@ -32,17 +29,20 @@
               <option value="company">Company</option>
             </select>
           </div>
+
           <!-- Comman components -->
+
           <div class="form-group">
-            <label for="fullname">Full Name</label>
+            <label id="fullnameLabel" for="fullname">Full Name</label>
             <input type="text" id="fullname" required />
           </div>
           <div class="form-group">
             <label for="username">Username</label>
-            <input type="text" id="username" required />
+            <input type="text" id="username" name="username" required />
+            <small id="username-feedback"></small>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" id = "volunteerEmail">
             <label for="email">Email Address</label>
             <input type="email" id="email" required />
           </div>
@@ -54,6 +54,11 @@
 
           <!-- Company-only fields -->
           <div id="company-only-fields" style="display:none;">
+            <div class="form-group">
+              <label for="companyName">Company Name</label>
+              <input type="text" id="companyName" />
+            </div>
+
             <div class="form-group">
               <label for="publicEmail">Public Contact Email</label>
               <input type="email" id="publicEmail" />
@@ -77,6 +82,17 @@
       </div>
     </main>
   </div>
+
+  <!-- JS Imports -->
+  <!-- Importing CryptoJS using a CDN so that we can hash sensitive data -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <!-- Firebase setup -->
+  <script type="module" src="../lib/firebase-config.js"></script>
+  <!-- Create a user -->
+  <script type="module" src="../lib/handle_signup.js"></script>
+  <!-- DOM handling -->
+  <script type="module" src="../lib/signup_dom.js"></script>
+
 </body>
 
 </html>

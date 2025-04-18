@@ -1,47 +1,52 @@
-let signup_form = document.querySelector(".signup-form");
-
-signup_form.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    let name = document.getElementById("fullname");
-    let username = document.getElementById("username");
-    let email = document.getElementById("email");
-    let password = document.getElementById("password");
-    
-    //Getting names from form using DOM 
-    let fullname = name.value;
-    let username_raw_txt = username.value;
-    let email_raw_txt = email.value;
-    let password_raw_txt = password.value;
-
-    //HASHING DATA
-    let username_hash = CryptoJS.SHA256(username_raw_txt).toString();
-    let email_hash = CryptoJS.SHA256(email_raw_txt).toString();
-    let password_raw_hash = CryptoJS.SHA256(password_raw_txt).toString();
-
-    console.log(fullname);
-    console.log(username_hash);
-
-    // Format data to send to backend for processing
-    const data = {
-        fullname: fullname,
-        usernameHash: username_hash,
-        emailHash: email_hash,
-        passwordHash: password_raw_hash // NOT safe yet!
-      };
-      
-      // Send `data` to backend
-      fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-    
-})
-
-
-//Toggle company only info
-document.getElementById("accountType").addEventListener("change", (e) => {
-  const isCompany = e.target.value === "company";
-  document.getElementById("company-only-fields").style.display = isCompany ? "block" : "none";
-});
+//Imports from firebase-config to authenticate session and create a new user
+import { auth, createUserWithEmailAndPassword } from './firebase-config.js';
+//Exporting registerVolunteer handler to dom handler signup_dom.js
+export async function registerVolunteer(email, password, username, fullname) {
+  try { 
+    //Create new user
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    //Store uid for document ID
+    const uid = userCredential.user.uid;
+    //Store email as a hashed string
+    const emailHash = CryptoJS.SHA256(email).toString();
+    //Send data to backend for handling
+    const res = await fetch("/api/volunteers/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ uid, username, fullname, email: emailHash })
+    });
+    //Response to json (stored in data)
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Unknown error");
+    //Return success status with uid (uid was originally meant for cookie handling, however users MUST login after signing up, logging in handles cookies)
+    return { success: true, uid };
+  } catch (err) { 
+    console.error("Signup error:", err);
+    return { success: false, message: err.message };
+  }
+}
+//Exporting registerCompany handler to dom handler signup_dom.js
+export async function registerCompany(email, password, companyData) {
+  try {
+    //Create new user
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    //Store uid for document ID
+    const uid = userCredential.user.uid;
+    //Store email as a hashed string
+    const emailHash = CryptoJS.SHA256(email).toString();
+    //Send data to backend for handling
+    const res = await fetch("/api/companies/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ uid, email: emailHash, ...companyData })
+    });
+    //Response to json (stored in data)
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Unknown error");
+    //Return success status with uid (uid was originally meant for cookie handling, however users MUST login after signing up, logging in handles cookies)
+    return { success: true, uid };
+  } catch (err) {
+    console.error("Signup error:", err);
+    return { success: false, message: err.message };
+  }
+}
