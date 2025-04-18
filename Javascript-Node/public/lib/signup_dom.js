@@ -12,34 +12,6 @@ function debounce(func, delay) {
 const usernameInput = document.getElementById("username");
 const feedback = document.getElementById("username-feedback");
 
-//Username check
-document.getElementById("username").addEventListener("blur", async () => {
-    const username = usernameInput.value.trim();
-
-    if (!username) return;
-
-    try {
-        const res = await fetch(`/api/check-username?username=${encodeURIComponent(username)}`);
-        const data = await res.json();
-
-        if (data.available) {
-            feedback.textContent = "Username is available";
-            feedback.style.color = "green";
-        } else {
-            feedback.textContent = "Username is taken";
-            feedback.style.color = "red";
-        }
-        // Enable/disable submit
-        document.getElementById("sign_up_submit").disabled = !data.available;
-    } catch (err) {
-        feedback.textContent = "Error checking username";
-        feedback.classList.add("warning");
-        console.error(err);
-        isUsernameAvailable = false;
-        document.getElementById("sign_up_submit").disabled = true;
-    }
-});
-
 //checks for username availability
 let isUsernameAvailable = false;
 
@@ -48,15 +20,21 @@ async function checkUsernameAvailability() {
     if (!username) return;
 
     try {
-        const res = await fetch(`/api/check-username?username=${encodeURIComponent(username)}`);
+        //Check if they're a company or not
+        const isCompany = document.getElementById("accountType").value === "company";
+        console.log(isCompany , isCompany ? "companies" : "volunteers")
+        const res = await fetch(`/api/${isCompany ? "companies" : "volunteers"}/check-username?username=${encodeURIComponent(username)}`);
         const data = await res.json();
         isUsernameAvailable = data.available;
-
         feedback.className = "feedback-message";
-        feedback.textContent = data.available
-            ? "Username is available"
-            : "Username is taken";
-        feedback.style.color = data.available ? "green" : "red";
+        if (data.available) {
+            feedback.textContent = "Username is available";
+            feedback.style.color = "green";
+        } else {
+            feedback.textContent = "Username is taken";
+            feedback.style.color = "red";
+        }
+        // Enable/disable submit
 
         document.getElementById("sign_up_submit").disabled = !data.available;
     } catch (err) {
@@ -72,7 +50,8 @@ async function checkUsernameAvailability() {
 // Wrap the checker with debounce (300ms delay)
 const debouncedCheck = debounce(checkUsernameAvailability, 300);
 
-// Bind to input event (fires as user types)
+
+//Username check - Bind to input event (fires as user types)
 usernameInput.addEventListener("input", debouncedCheck);
 
 //Submit handler

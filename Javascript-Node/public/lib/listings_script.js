@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   //Request our DB for a bunch of listings, thinking of limiting response from server
   try {
-    const res = await fetch("/api/listings");
+    const res = await fetch("/api/listings/");
     const listings = await res.json(); // Turn response into json
     listings.forEach(listing => {
       const card = document.createElement("div"); // creates div tag

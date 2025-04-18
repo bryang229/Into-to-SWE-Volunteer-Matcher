@@ -6,7 +6,7 @@ export async function registerVolunteer(email, password, username, fullname) {
     const uid = userCredential.user.uid;
     const emailHash = CryptoJS.SHA256(email).toString();
 
-    const res = await fetch("/api/register/volunteer", {
+    const res = await fetch("/api/volunteers/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ uid, username, fullname, email: emailHash })
@@ -28,7 +28,7 @@ export async function registerCompany(email, password, companyData) {
     const uid = userCredential.user.uid;
     const emailHash = CryptoJS.SHA256(email).toString();
 
-    const res = await fetch("/api/register/company", {
+    const res = await fetch("/api/company/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ uid, email: emailHash, ...companyData })

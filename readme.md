@@ -16,37 +16,47 @@ This is the backend server for the Volunteer Platform demo. It's built using Nod
 
 ---
 
-## Folder Structure (as of 4/6/25)
+## Folder Structure (as of 4/17/25)
 ```
 Javascript-Node/
 ├── public/              # Frontend files (HTML/CSS/JS)
-    ├── lib/
-        ├── handle_login.js  # not functional
-        ├── handle_signup.js # handles adding new users to DB
-        ├── script.js    # Creates listings to appear dynamically from JSON DB
-    ├── static/
-        ├── listings.css # Styles the listings components created in script.js
-        ├── sign_up.css  # Styles both login and sign in forms
-        ├── style.css    # Styles nav bar and basic stuff
-    ├── templates/
-        ├── index.html   # Root page, currently shows listings in JSON
-        ├── login.html   # Login page, currently not functional
-        ├── sign_up.html # Sign up page, functional, hashes data
+|   ├── lib/
+│   |   ├── firebase-config.js  # connects us to firebase app for sign ups and logins
+│   |   ├── handle_login.js  # handles logging a user in and talks to backend for cookie session
+│   |   ├── handle_signup.js # handles adding new users to DB
+│   |   ├── login_dom.js # empty may be removed, kept for consistency 
+│   |   ├── signup_dom.js # handles what should be shown on DOM (text inputs) and checks for username availability 
+│   |   └── listings_script.js    # Creates listings to appear dynamically from JSON DB
+│   ├── static/
+│   |   ├── listings.css # Styles the listings components created in script.js
+│   |   ├── sign_up.css  # Styles both login and sign in forms
+│   |   └── style.css    # Styles nav bar and basic stuff
+|   └── templates/
+│       ├── index.html   # Root page, currently shows listings in JSON
+│       ├── login.html   # Login page, currently not functional
+│       ├── sign_up.html # Sign up page, functional, hashes data
+│       └── dashboard.html # Login redirects here, currently empty, should show user details, editable etc
 ├── server/              # Backend code and data
 │   ├── server.js        # Main Express server
-    ├── firebase.js             # Firebase Admin SDK config lives here
-    ├── routes/
-    │   ├── authRoutes.js       # Routes like signup/login
-    │   ├── volunteerRoutes.js  # Protected routes for volunteers
-    │   └── companyRoutes.js  
-    ├── controllers/
-│       └── userController.js   # Business logic, like createProfile, etc. 
+│   ├── firebase.js             # Firebase Admin SDK config lives here
+│   ├── routes/
+│   │   ├── authRoutes.js       # Routes login cookie sessions and more
+│   │   ├── listingsRoutes.js   # Protected routes for listings
+│   │   ├── volunteerRoutes.js  # Protected routes for volunteers
+│   │   └── companyRoutes.js    # Protected routes for companies
+│   └── controllers/
+│       ├── authController.js           # logic for auth routes
+│       ├── listingsController.js       # logic for listings routes
+│       ├── volunteersController.js     # logic for volunteers routes
+│       └── companyController.js        # logic for company routes
 ├── package.json         # Project config & scripts
-├── secrets/
+├── secrets/             #not in github L hackers
 │   └── serviceAccountKey.json
-├── .env
+├── .env                 #not in github L hackers
 ├── node_modules/
 ├── .gitignore 
+├── .gitattributes
+├── LICENSE -> MIT
 └── README.md            # This file
 ```
 
@@ -72,28 +82,131 @@ This starts the Express server on http://localhost:3000
 
 ## Available API Endpoints
 
-GET all volunteers
-```
-/api/volunteers
+### GET /volunteers/
+
+Returns all volunteer profiles.
+Use only for development/testing.
+
+### Response:
+```json
+[
+  {
+    "id": "abc123",
+    "username": "johndoe",
+    "fullname": "John Doe",
+    "hashedEmail": "…",
+    "hashedPassword": "…"
+  },
+  ...
+]
 ```
 
-GET all companies
+### GET /volunteers/check-username?username=VALUE
+
+Checks if a volunteer username is available.
+
+Query Parameters:
+	•	username (string) – required
+
+### Response:
+
+```json
+{ "available": true }
 ```
-/api/companies
+### GET /volunteers/:username
+
+Returns a single volunteer profile by username.
+
+Path Parameters:
+	•	username (string) – required
+
+### Response:
+```json
+{
+  "id": "abc123",
+  "username": "johndoe",
+  "fullname": "John Doe",
+  ...
+}
 ```
-GET all listings
+### Error:
+
+```json
+{ "error": "Volunteer not found" } // 404
 ```
-/api/listings
+### POST /volunteers/register
+
+Registers a new volunteer.
+
+### Body (JSON):
+```json
+{
+  "username": "johndoe",
+  "fullname": "John Doe",
+  "email": "john@example.com",
+  "password": "plaintextpassword"
+}
 ```
 
-GET specific volunteer by username
+### Response:
+```json
+{ "message": "Volunteer registered", "id": "abc123" }
 ```
-/api/volunteers/:username
+### Error (username taken)
+```json
+{ "error": "Username already exists" } // 409
 ```
 
-POST new user
+### GET /companies/check-username?username=VALUE
+
+Checks if a company username is available.
+
+Query Parameters:
+	•	username (string) – required
+
+### Response:
+```json
+{ "available": true }
 ```
-/api/register
+
+
+### POST /companies/register
+
+Registers a new company.
+
+### Body (JSON):
+```json
+{
+  "uid": "firebaseUID",
+  "username": "companyname",
+  "companyName": "My Company",
+  "admin_fullname": "Admin Name",
+  "publicEmail": "contact@company.com",
+  "privateEmail": "admin@company.com",
+  "companyBio": "We do things."
+}
+```
+### Response
+```json
+{ "message": "Company registered", "uid": "firebaseUID" }
+```
+
+### POST /sessionLogin
+
+Exchanges a Firebase ID token for a session cookie.
+
+### Body (JSON):
+```json
+{ "idToken": "firebaseIdToken" }
+```
+
+### Response 
+```json
+{ "message": "Login successful" }
+```
+### Error
+```json
+{ "error": "Invalid ID token" } // 401
 ```
 
 ---
