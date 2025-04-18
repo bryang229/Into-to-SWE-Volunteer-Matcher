@@ -1,16 +1,15 @@
 // Importing dependencies 
 const express = require('express');
 const path = require('path');
-const { db } = require("./firebase"); //Loads firebase.js to authenticate our session using our key
+const { db, admin, auth } = require("./firebase"); //Loads firebase.js to authenticate our session using our key
 const cryptoJS = require("crypto-js");
-//Cookies not implemented yet
-// const cookieParser = require("cookie-parser");
+const cookieParser = require("cookie-parser");
 
 //Setting up app
 const app = express(); // Creating app object
 app.use(express.static(path.join(__dirname, '../public'))); //Connecting frontend
 app.use(express.json());
-// app.use(cookieParser)
+app.use(cookieParser())
 
 //Redirects root route to home page
 app.get('/', (req, res) => {
@@ -32,7 +31,7 @@ app.get('/api/volunteers', async (req, res) => {
 //GET all companies
 app.get('/api/companies', async (req, res) => {
   try {
-    const snapshot = await db.collection('Company').get();
+    const snapshot = await db.collection('companies').get();
     const companies = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     res.json(companies);
   } catch (err) {
@@ -150,9 +149,8 @@ app.post("/api/register/company", async (req, res) => {
       admin_fullname,
       username,
       publicEmail: publicEmail || null,
-      privateEmail: privateEmail || null,
       companyBio: companyBio || "",
-      hashedEmail: cryptoJS.SHA256(email).toString(),
+      hashedEmail: cryptoJS.SHA256(privateEmail).toString(),
       createdAt: new Date()
     };
 
@@ -165,11 +163,37 @@ app.post("/api/register/company", async (req, res) => {
   }
 });
 
-//not implemented
-// app.post('/api/login', (req, res) => {
+// Helper: Set a cookie with the Firebase session token
+async function setSessionCookie(idToken, res) {
+  const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
+  const sessionCookie = await admin.auth().createSessionCookie(idToken, { expiresIn });
 
-//   // is
-// });
+  const options = {
+      maxAge: expiresIn,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+  };
+
+  res.cookie('session', sessionCookie, options);
+}
+
+// POST /api/sessionLogin
+app.post('/api/sessionLogin', async (req, res) => {
+  console.log("Raw request body:", req.body);
+  const { idToken } = req.body;
+  console.log("Received ID token:", idToken);
+  if (!idToken) {
+    return res.status(400).send({ error: "ID token missing from request" });
+  }
+  try {
+      await setSessionCookie(idToken, res);
+      res.status(200).send({ message: 'Login successful' });
+  } catch (error) {
+      res.status(401).send({ error: error.message });
+  }
+});
 
 const PORT = 3000;
 app.listen(PORT, () => {

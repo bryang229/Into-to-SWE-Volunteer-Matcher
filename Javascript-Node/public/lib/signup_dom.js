@@ -79,9 +79,9 @@ usernameInput.addEventListener("input", debouncedCheck);
 document.querySelector(".signup-form").addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const password = document.getElementById("password").value;
-    const fullname = document.getElementById("fullname").value;
-    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value.trim();
+    const fullname = document.getElementById("fullname").value.trim();
+    const username = document.getElementById("username").value.trim();
     const accountType = document.getElementById("accountType").value;
 
     let result;
@@ -103,14 +103,14 @@ document.querySelector(".signup-form").addEventListener("submit", async (e) => {
         });
     }
 
-    if (result.success){
+    if (result.success) {
         alert("Registered successfully!");
 
         // Delay a little for the user to see it (optional)
         setTimeout(() => {
-          window.location.href = "/templates/login.html";
+            window.location.href = "/templates/login.html";
         }, 1000);
-    }else{
+    } else {
         alert("Error sign up failed " + result.message);
     }
 
