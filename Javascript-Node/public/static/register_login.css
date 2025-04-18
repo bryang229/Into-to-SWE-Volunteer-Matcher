@@ -1,4 +1,4 @@
-/* Sign up page specific styles */
+/* Register/Login CSS */
 
 #sign_up_div{
     margin-left: auto;
@@ -15,7 +15,8 @@
 }
 
 /* General form styling */
-.signup-form {
+.signup-form,
+.login-form{
     max-width: 400px;
     margin: 2rem auto;
     padding: 2rem;
@@ -27,11 +28,13 @@
   }
   
   /* Form field blocks */
-  .signup-form .form-group {
+  .signup-form .form-group,
+  .login-form .form-group {
     margin-bottom: 1.5rem;
   }
   
-  .signup-form label {
+  .signup-form label,
+  .login-form label {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 600;
@@ -40,7 +43,10 @@
   
   .signup-form input[type="text"],
   .signup-form input[type="email"],
-  .signup-form input[type="password"] {
+  .signup-form input[type="password"],
+  .login-form input[type="text"],
+  .login-form input[type="email"],
+  .login-form input[type="password"] {
     width: 100%;
     padding: 0.6rem;
     border: 1px solid #ccc;
@@ -98,7 +104,8 @@
   }
   
   /* Submit button */
-  .signup-form button {
+  .signup-form button,
+  .login-form button {
     width: 100%;
     padding: 0.8rem;
     background-color: #4CAF50;
@@ -128,7 +135,8 @@
   
 
   /* Select - Drop down  */
-  .signup-form select {
+  .signup-form select,
+  .login-form select {
     width: 100%;
     padding: 0.6rem;
     border: 1px solid #ccc;
@@ -145,7 +153,8 @@
     background-size: 16px 16px;
   }
   
-  .signup-form select:focus {
+  .signup-form select:focus,
+  .login-form select:focus {
     border-color: #4CAF50;
     outline: none;
   }
@@ -153,7 +162,8 @@
 /* Mobile formatting */
 /* Make the form responsive for smaller screens */
 @media screen and (max-width: 600px) {
-  .signup-form {
+  .signup-form,
+  .login-form {
     padding: 1rem;
     margin: 1rem;
     font-size: 14px;
@@ -162,7 +172,11 @@
   .signup-form input,
   .signup-form select,
   .signup-form textarea,
-  .signup-form button {
+  .signup-form button,
+  .login-form input,
+  .login-form select,
+  .login-form textarea,
+  .login-form button {
     font-size: 14px;
     padding: 0.6rem;
   }

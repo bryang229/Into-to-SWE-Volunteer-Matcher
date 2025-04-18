@@ -1,31 +1,33 @@
-// signup_dom.js
+//Importing register handlers from handle_signup.js
 import { registerVolunteer, registerCompany } from './handle_signup.js';
 
+//Debounce method allows for delayed checks (every 300ms) input is updated 
+//Debounce(func, delay) works as a wrapper method, delaying concurrent method calls by delay ms
 function debounce(func, delay) {
-    let timeoutId;
+    let timeoutId; 
     return function (...args) {
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => func.apply(this, args), delay);
     };
 }
-
+//Getting username input tag and username-feedback small tag DOM objects
 const usernameInput = document.getElementById("username");
 const feedback = document.getElementById("username-feedback");
 
-//checks for username availability
+//Global boolean for controlling whether the user can submit (they can't if they are using a used username)
 let isUsernameAvailable = false;
 
+//This function calls the backend's /api/accountType/register route to see if the usernames are usedat 
 async function checkUsernameAvailability() {
-    const username = usernameInput.value.trim();
+    const username = usernameInput.value.trim(); //gets current username input
     if (!username) return;
 
     try {
-        //Check if they're a company or not
-        const isCompany = document.getElementById("accountType").value === "company";
-        console.log(isCompany , isCompany ? "companies" : "volunteers")
-        const res = await fetch(`/api/${isCompany ? "companies" : "volunteers"}/check-username?username=${encodeURIComponent(username)}`);
+        //Using NEW /api/check-username?username=query route which checks if the username is in EITHER collection
+        const res = await fetch(`/api/check-username?username=${encodeURIComponent(username)}`);
         const data = await res.json();
         isUsernameAvailable = data.available;
+
         feedback.className = "feedback-message";
         if (data.available) {
             feedback.textContent = "Username is available";
@@ -57,21 +59,23 @@ usernameInput.addEventListener("input", debouncedCheck);
 //Submit handler
 document.querySelector(".signup-form").addEventListener("submit", async (e) => {
     e.preventDefault();
-
+    //Getting input field data (these are used in either account type
     const password = document.getElementById("password").value.trim();
     const fullname = document.getElementById("fullname").value.trim();
     const username = document.getElementById("username").value.trim();
-    const accountType = document.getElementById("accountType").value;
+    const accountType = document.getElementById("accountType").value; //getting account type
 
-    let result;
-    if (accountType === "volunteer") {
-        const email = document.getElementById("email").value;
-        result = await registerVolunteer(email, password, username, fullname);
+    let result; 
+    if (accountType === "volunteer") { 
+        const email = document.getElementById("email").value;  //getting volunteer specific data
+        result = await registerVolunteer(email, password, username, fullname); //using handler
     } else {
+        //getting company specific data
         const publicEmail = document.getElementById("publicEmail").value.trim();
         const privateEmail = document.getElementById("privateEmail").value.trim();
         const companyBio = document.getElementById("companyBio").value.trim();
         const companyName = document.getElementById("companyName").value.trim();
+        //using handler
         result = await registerCompany(privateEmail, password, {
             companyName,
             admin_fullname: fullname,
@@ -84,7 +88,6 @@ document.querySelector(".signup-form").addEventListener("submit", async (e) => {
 
     if (result.success) {
         alert("Registered successfully!");
-
         // Delay a little for the user to see it (optional)
         setTimeout(() => {
             window.location.href = "/templates/login.html";
@@ -105,7 +108,6 @@ document.getElementById("accountType").addEventListener("change", (e) => {
 
     //label update
     document.getElementById("fullnameLabel").innerText = isCompany ? "Admin Full Name" : " Full Name";
-
 
     // Company-only required fields
     const companyRequiredFields = ["companyName", "publicEmail", "privateEmail", "companyBio"];
