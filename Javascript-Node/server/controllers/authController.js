@@ -8,11 +8,13 @@ const sessionLogin = async (req, res) => {
     const sessionCookie = await admin.auth().createSessionCookie(idToken, { expiresIn });
     res.cookie('session', sessionCookie, {
       maxAge: expiresIn,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      httpOnly: false,   //false for testing, true for production
+      secure: false,
+      //secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
     });
+    console.log("Cookie set with:", sessionCookie);
     res.status(200).json({ message: 'Login successful' });
   } catch (error) {
     res.status(401).json({ error: error.message });
@@ -44,6 +46,12 @@ const username_lowercase = username.trim().toLowerCase();
 
     const isAvailable = snapshot_companies.empty && snapshot_volunteers.empty;
 
+   
+
+
+
+
+
     return res.status(200).json({ available: isAvailable });
   } catch (err) {
     console.error("Error checking username:", err);
@@ -51,7 +59,24 @@ const username_lowercase = username.trim().toLowerCase();
   }
 };
 
+const logout = (req, res) => {
+  try {
+    res.clearCookie("session", {
+      httpOnly: false, // match how you set it earlier
+      secure: false,
+      sameSite: 'lax',
+      path: '/',
+    });
+    return res.status(200).json({ message: "Logged out" });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to logout" });
+  }
+};
+
+
+
 module.exports = {
     sessionLogin,
-    checkUsername
+    checkUsername,
+    logout
 };
