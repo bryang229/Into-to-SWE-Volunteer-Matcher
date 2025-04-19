@@ -24,23 +24,30 @@ document.querySelector(".login-form").addEventListener("submit", async (e) => {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         //Getting firebase provided idToken to create sessionCookie (backend)
         const idToken = await userCredential.user.getIdToken();
+        console.log("Got ID Token:", idToken); // DEBUG LINE
         //Sending idToken so backend can make cookie
+        console.log("Sending POST to /api/sessionLogin...");
+
         const res = await fetch("/api/sessionLogin", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include', // <--- CRITICAL FOR COOKIES
             body: JSON.stringify({ idToken }), // must be this exact shape
+            
         });
+        console.log("Server responded with:", res.status);
 
         //Response to json to verify the response
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Unknown error");
 
         if (res.ok) {
-            window.location.href = '/templates/dashboard.html'; //Redirect to dashboard so users can edit details/populate
+            window.location.href = '/templates/index.html'; //Redirect to dashboard so users can edit details/populate
         } else {
             document.getElementById('errorMessage').innerText = data.error || 'Login failed';
         }
     } catch (error) {
         document.getElementById('errorMessage').innerText = "Firebase login error: " + error.code + " " + error.message;
+        console.error("Login error:", error);
     }
 });
