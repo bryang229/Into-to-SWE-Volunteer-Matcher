@@ -3,49 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My JavaScript Web App</title>
-  <link rel="stylesheet" href="../static/style.css" />
-  <link rel="stylesheet" href="../static/listings.css" />
-  <script src="../lib/listings_script.js" defer></script>
+  <title>Find Opportunities!</title>
+  <link rel="stylesheet" href="../static/base.css" />
+  <link rel="stylesheet" href="../static/pages/listings.css" />
 </head>
-<body>
+<body class="listing-page">
+  <div class="listing-grid-wrapper">
   <nav>
-    <div class="nav-login" id="nav-controls">
-      <a id="loginLink" href="/templates/sign_up.html">Sign up/Login</a>
-      <button id="logoutBtn" style="display: none;">Logout</button>
-    </div>
-    <div class="nav-title"><a href="/templates/index.html">PLATFORM name</a></div>
+    <div class="nav-login">
+    <a id="loginLink" href="/templates/sign_up.html">Sign up/Login</a>
+    <button id="logoutBtn" style="display: none;">Logout</button>
+  </div>
+  <div class="nav-title"><a href="/templates/index.html">PLATFORM name</a></div>
   </nav>
 
   <h1>Upcoming Volunteer Opportunities</h1>
-  <section id="listing-container" class="listing-grid"></section>
+
+    <section id="listing-container" class="listing-grid"></section>
+  </div>
+
 
   <!-- All cookie logic runs after DOM is ready -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const hasSession = document.cookie.includes("session");
-      const logoutBtn = document.getElementById("logoutBtn");
-      const loginLink = document.getElementById("loginLink");
-  
-      console.log("Cookie:", document.cookie);
-      console.log("Session exists?", hasSession);
-      console.log("logoutBtn found?", !!logoutBtn);
-      console.log("loginLink found?", !!loginLink);
-  
-      if (hasSession && logoutBtn && loginLink) {
-        logoutBtn.style.display = "inline-block";
-        loginLink.style.display = "none";
-      }
-  
-      if (logoutBtn) {
-        logoutBtn.addEventListener("click", async () => {
-          console.log("Logout button clicked");
-          await fetch("/api/logout", { method: "POST" });
-          document.cookie = "session=; Max-Age=0; path=/";
-          location.reload();
-        });
-      }
-    });
-  </script>
+  <script type="module" src = "../lib/auth/cookies.js"></script>
+  <script type="module" src="../lib/index/index_dom.js"></script>
+
 </body>
 </html>

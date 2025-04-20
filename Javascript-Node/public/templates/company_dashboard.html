@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Company Dashboard</title>
+  <link rel="stylesheet" href="/static/base.css" />
+  <link rel="stylesheet" href="/static/pages/dashboard.css" />
+</head>
+<body>
+    <nav>
+        <div class="nav-login">
+          <a id="loginLink" href="/templates/sign_up.html">Sign up/Login</a>
+          <button id="logoutBtn" style="display: none;">Logout</button>
+        </div>
+        <div class="nav-title"><a href="/templates/index.html">PLATFORM name</a></div>
+      </nav>
+
+  <main class="dashboard-content">
+    <h1>Welcome, <span id="displayName">...</span></h1>
+
+    <section class="dashboard-profile">
+        <h2>Company Profile</h2>
+      
+        <form id="companyProfileForm">
+          <label>
+            Company Name:
+            <input type="text" id="companyName" disabled />
+          </label>
+      
+          <label>
+            Public Contact Email:
+            <input type="email" id="publicEmail" />
+          </label>
+      
+          <label>
+            Private Admin Email:
+            <input type="email" id="privateEmail" disabled />
+          </label>
+      
+          <label>
+            Company Bio:
+            <textarea id="companyBio" placeholder="What does your company do?"></textarea>
+          </label>
+      
+          <label class="privacy-toggle">
+            Allow Public Listing View:
+            <input type="checkbox" id="listingVisibilityToggle" />
+            <span class="toggle-switch"></span>
+          </label>
+      
+          <button type="submit">Update Company Info</button>
+        </form>
+      
+        <section class="company-listings">
+          <h3>Your Volunteer Listings</h3>
+          <button id="createListingBtn">+ Create New Listing</button>
+          <ul id="listingList">
+            <!-- Dynamic list of existing listings -->
+          </ul>
+        </section>
+      </section>
+
+    <div id="companyFeatures" style="display:none;">
+      <h2>Company Panel</h2>
+      <p>Manage your listings...</p>
+    </div>
+  </main>
+
+  <script type="module" src="/lib/dashboard/company_dom.js"></script>
+</body>
+</html>

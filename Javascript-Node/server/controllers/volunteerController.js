@@ -4,7 +4,7 @@ const cryptoJS = require("crypto-js");
 // POST /api/volunteers/register
 const registerVolunteer = async (req, res) => {
   // Get info from body of request
-  const { username, fullname, email, password } = req.body;
+  const { username, fullname, email, uid } = req.body;
   try {
     // Check if username is used - might be redundant 
     const existingUserSnap_vol = await db.collection('Volunteers').where("username", "==", username).get();
@@ -26,8 +26,9 @@ const registerVolunteer = async (req, res) => {
       createdAt: new Date()
     };
     // Send to database
-    const ref = await db.collection("Volunteers").add(volunteerData);
-    res.status(201).json({ message: "Volunteer registered", id: ref.id });
+    await db.collection("Volunteers").doc(uid).set(volunteerData);
+    await admin.auth().setCustomUserClaims(uid, { accountType: "volunteer" });
+    res.status(201).json({ message: "Volunteer registered", uid });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

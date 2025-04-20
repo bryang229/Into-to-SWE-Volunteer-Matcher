@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Volunteer Dashboard</title>
+  <link rel="stylesheet" href="/static/base.css" />
+  <link rel="stylesheet" href="/static/pages/dashboard.css" />
+</head>
+<body>
+    <nav>
+        <div class="nav-login">
+          <a id="loginLink" href="/templates/sign_up.html">Sign up/Login</a>
+          <button id="logoutBtn" style="display: none;">Logout</button>
+        </div>
+        <div class="nav-title"><a href="/templates/index.html">PLATFORM name</a></div>
+      </nav>
+
+  <main class="dashboard-content">
+    <h1>Welcome, <span id="displayName">...</span></h1>
+
+    <section class="dashboard-profile">
+        <h2>Your Volunteer Profile</h2>
+      
+        <form id="profileForm">
+          <label>
+            Bio:
+            <textarea id="bio" placeholder="Tell us about yourself..."></textarea>
+          </label>
+      
+          <label>
+            Location:
+            <input type="text" id="location" placeholder="e.g. Brooklyn, NY" />
+          </label>
+      
+          <label>
+            Interests:
+            <select id="interests" multiple>
+              <option value="environment">Environment</option>
+              <option value="education">Education</option>
+              <option value="animals">Animal Welfare</option>
+              <option value="arts">Arts & Culture</option>
+              <option value="health">Health</option>
+              <option value="tech">Tech</option>
+            </select>
+          </label>
+      
+          <label>
+            Age:
+            <input type="number" id="age" min="13" max="120" />
+          </label>
+      
+          <label>
+            Experience (years):
+            <input type="number" id="experience" min="0" max="50" />
+          </label>
+      
+          <label class="privacy-toggle">
+            Privacy Mode:
+            <input type="checkbox" id="privacyToggle" />
+            <span class="toggle-switch"></span>
+          </label>
+      
+          <button type="submit">Save Changes</button>
+        </form>
+      
+        <section class="volunteer-status">
+          <h3>Your Applications</h3>
+          <ul id="applicationList">
+            <!-- Dynamic list of submitted applications -->
+          </ul>
+        </section>
+      </section>
+
+    <div id="volunteerFeatures" style="display:none;">
+      <h2>Volunteer Panel</h2>
+      <p>Apply to new opportunities...</p>
+    </div>
+
+  </main>
+
+  <script type="module" src="/lib/dashboard/volunteer_dom.js"></script>
+</body>
+</html>

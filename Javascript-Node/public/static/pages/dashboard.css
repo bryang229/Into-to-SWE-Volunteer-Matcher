@@ -1,0 +1,89 @@
+.dashboard-profile {
+    background: #fff;
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 600px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  }
+  
+  .dashboard-profile h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .dashboard-profile label {
+    display: block;
+    margin-bottom: 1rem;
+  }
+  
+  .dashboard-profile input,
+  .dashboard-profile textarea,
+  .dashboard-profile select {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    margin-top: 0.25rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .dashboard-profile textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  
+  .dashboard-profile button {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    font-size: 1rem;
+    width: 100%;
+    background-color: #1e90ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .dashboard-profile button:hover {
+    background-color: #0d6efd;
+  }
+  
+  .privacy-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .privacy-toggle input[type="checkbox"] {
+    display: none;
+  }
+  
+  .toggle-switch {
+    width: 40px;
+    height: 20px;
+    background: #ccc;
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .toggle-switch::after {
+    content: '';
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    transition: transform 0.3s ease;
+  }
+  
+  .privacy-toggle input[type="checkbox"]:checked + .toggle-switch::after {
+    transform: translateX(20px);
+  }
+  
+  .privacy-toggle input[type="checkbox"]:checked + .toggle-switch {
+    background: #4caf50;
+  }

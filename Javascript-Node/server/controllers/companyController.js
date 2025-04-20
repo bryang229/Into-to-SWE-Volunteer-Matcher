@@ -24,7 +24,9 @@ const registerCompany = async (req, res) => {
       createdAt: new Date()
     };
 
-    await db.collection('companies').doc(uid).set(data);
+    await db.collection("companies").doc(uid).set(volunteerData);
+    await admin.auth().setCustomUserClaims(uid, { accountType: "company" });
+
     res.status(201).json({ message: "Company registered", uid });
   } catch (err) {
     console.error("Error registering company:", err);

@@ -1,5 +1,5 @@
 //Imports from firebase-config to authenticate session and create a new user
-import { auth, createUserWithEmailAndPassword } from './firebase-config.js';
+import { auth, createUserWithEmailAndPassword } from '../auth/firebase-config.js';
 //Exporting registerVolunteer handler to dom handler signup_dom.js
 export async function registerVolunteer(email, password, username, fullname) {
   try { 
@@ -8,7 +8,7 @@ export async function registerVolunteer(email, password, username, fullname) {
     //Store uid for document ID
     const uid = userCredential.user.uid;
     //Store email as a hashed string
-    const emailHash = CryptoJS.SHA256(email).toString();
+    const emailHash = CryptoJS.SHA256(email).toString(); // This is problematic, causes double hashing of emails, look into removing
     //Send data to backend for handling
     const res = await fetch("/api/volunteers/register", {
       method: "POST",

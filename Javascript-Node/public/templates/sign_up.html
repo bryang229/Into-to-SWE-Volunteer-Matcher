@@ -4,19 +4,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My JavaScript Web App</title>
-  <link rel="stylesheet" href="../static/style.css" />
-  <link rel="stylesheet" href="../static/register_login.css" />
+  <title>Sign Up!</title>
+  <link rel="stylesheet" href="../static/base.css" />
+  <link rel="stylesheet" href="../static/pages/register_login.css" />
 
 
 </head>
 
 <body>
   <nav>
-    <div class="nav-login"> Sign up/Login</div>
+    <div class="nav-login">
+      <a id="loginLink" href="/templates/sign_up.html">Sign up/Login</a>
+      <button id="logoutBtn" style="display: none;">Logout</button>
+    </div>
     <div class="nav-title"><a href="/templates/index.html">PLATFORM name</a></div>
-
   </nav>
+
   <div id="sign_up_div">
     <main class="account_form" id="sign_up_form">
       <div>
@@ -42,7 +45,7 @@
             <small id="username-feedback"></small>
           </div>
 
-          <div class="form-group" id = "volunteerEmail">
+          <div class="form-group" id="volunteerEmail">
             <label for="email">Email Address</label>
             <input type="email" id="email" required />
           </div>
@@ -86,12 +89,8 @@
   <!-- JS Imports -->
   <!-- Importing CryptoJS using a CDN so that we can hash sensitive data -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-  <!-- Firebase setup -->
-  <script type="module" src="../lib/firebase-config.js"></script>
-  <!-- Create a user -->
-  <script type="module" src="../lib/handle_signup.js"></script>
   <!-- DOM handling -->
-  <script type="module" src="../lib/signup_dom.js"></script>
+  <script type="module" src="../lib/sign_up/signup_dom.js"></script>
 
 </body>
 
