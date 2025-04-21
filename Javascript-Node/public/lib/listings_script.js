@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <h2>${listing.title}</h2>
         <p><strong>Location:</strong> ${listing.location}</p>
         <p><strong>Date:</strong> ${listing.date}</p>
-        <p><strong>Company:</strong> ${listing.company_name}</p>
+        <p><strong>Company:</strong> ${listing.company}</p>
         <p class="tags"><strong>Tags:</strong> ${listing.tags.join(", ")}</p>
         <p>${listing.description.substring(0, 100)}...</p>
         <button class="view-details-btn">View Details</button>
@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <h2>${listing.title}</h2>
           <p><strong>Location:</strong> ${listing.location}</p>
           <p><strong>Date:</strong> ${listing.date}</p>
-          <p><strong>Company:</strong> ${listing.company_name}</p>
+          <p><strong>Company:</strong> ${listing.company}</p>
           <p><strong>Description:</strong> ${listing.description}</p>
           <p><strong>Tags:</strong> ${listing.tags.join(", ")}</p>
           ${loggedIn
