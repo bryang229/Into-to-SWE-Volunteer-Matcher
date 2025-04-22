@@ -131,6 +131,7 @@ const getUserInfo = async (req, res) => {
       const companyData = companySnap.data();
       return res.json({
         role: 'company',
+        accountType: 'company', 
         uid,
         companyName: companyData.companyName
       });

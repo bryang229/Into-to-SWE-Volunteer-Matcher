@@ -1,17 +1,30 @@
-document.getElementById("logout-btn").addEventListener("click" , async () =>{
-    try {
-        const res = await fetch('/api/auth/logout', {
-            method: 'POST',
-            credentials: 'include'
-        });
-        if (res.ok) {
-            document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            window.location.href = '/templates/login.html';
+console.log('Script loaded, setting up logout listener');
+
+const logoutBtn = document.getElementById("logout-btn");
+if (!logoutBtn) {
+    console.error('Logout button not found!');
+} else {
+    console.log('Logout button found, adding listener');
+    logoutBtn.addEventListener("click", async () => {
+        console.log('Logout clicked');
+        try {
+            const res = await fetch('/api/logout', {  // Changed from '/api/auth/logout'
+                method: 'POST',
+                credentials: 'include'
+            });
+            console.log('Logout response:', res);
+            if (res.ok) {
+                document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                window.location.href = '/templates/login.html';
+            } else {
+                alert('Logout failed: ' + res.statusText);
+            }
+        } catch (err) {
+            console.error('Logout failed:', err);
+            alert('Logout failed: ' + err.message);
         }
-    } catch (err) {
-        console.error('Logout failed:', err);
-    }
-});
+    });
+}
 
 document.addEventListener("DOMContentLoaded", async () => {
     const form = document.getElementById("listingForm");
@@ -106,13 +119,36 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (userRole === 'company') {
             console.log('Company detected - staying on page');
+            
+            // Debug: Log the entire userData object
+            console.log('Full user data:', JSON.stringify(userData, null, 2));
+            
+            // Debug: Check if company field exists
+            console.log('Company field element:', companyField);
+            console.log('Company field properties:', {
+                id: companyField.id,
+                value: companyField.value,
+                readOnly: companyField.readOnly
+            });
+            
+            // Set and verify company name
+            const companyName = userData.autofilledCompany || 
+                              userData.companyName || 
+                              userData.company_name ||
+                              userData.name ||  // Try 'name' field too
+                              'Unknown Company';
+                              
+            companyField.value = companyName;
+            
+            // Debug: Verify the value was set
+            console.log('Attempted to set company name to:', companyName);
+            console.log('Company field value after setting:', companyField.value);
         } else {
             console.log('Unknown role detected - redirecting to index');
             window.location.replace("/templates/index.html");
             return;
         }
 
-        companyField.value = userData.companyName || 'Unknown Company';
     } catch (err) {
         console.error("Auth error:", err.message);
         window.location.replace("/templates/login.html");
