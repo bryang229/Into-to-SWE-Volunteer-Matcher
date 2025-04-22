@@ -21,4 +21,4 @@ document.addEventListener("DOMContentLoaded", async () => {
         }, 10000);
     }
 
-});//TypeError: null is not an object (evaluating 'document.getElementById("accountType").textContent = cachedUserData.accountType') — 
+});

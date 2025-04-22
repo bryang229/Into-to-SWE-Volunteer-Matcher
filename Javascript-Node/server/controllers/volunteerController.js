@@ -34,6 +34,33 @@ const registerVolunteer = async (req, res) => {
   }
 };
 
+// POST /api/volunteers/update -> Update user details
+const updateVolunteerData = async(req, res) => {
+  /*TODO: Use below logic to create protected data checking for limiting what can be updated  
+    const allowedFields = [...];
+    const updateData = {};
+
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        updateData[field] = req.body[field];
+      }
+    }
+  */
+  try{
+    let updateData = req.body;
+    let { uid } = req.user;
+    // console.log("Got uid", uid);
+    // console.log("Payload", updateData);
+    await db.collection("Volunteers").doc(uid).set(updateData, {merge: true});
+    res.status(201).json({message: "Volunteer data updated", uid});
+  } catch(err){
+    console.log(err.message);
+    res.status(500).json({error: err.message});
+  }
+}
+
+
+
 // GET /api/volunteers -> returns all volunteers, should be removed when not testing (production)
 const getVolunteers = async (req, res) => {
   try {
@@ -81,6 +108,7 @@ const checkUsername = async (req, res) => {
 //Export functions so they can be used in routers to link the function to the route!
 module.exports = {
   registerVolunteer,
+  updateVolunteerData,
   getVolunteers,
   getVolunteerByUsername,
   checkUsername

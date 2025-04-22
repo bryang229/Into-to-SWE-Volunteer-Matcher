@@ -1,75 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Volunteer Dashboard</title>
-  <link rel="stylesheet" href="/static/base.css" />
-  <link rel="stylesheet" href="/static/pages/dashboard.css" />
+  <link rel="stylesheet" href="../static/base.css" />
+  <link rel="stylesheet" href="../static/pages/dashboard.css" />
 </head>
+
 <body>
-    <nav>
-        <div class="nav-login">
-          <a id="loginLink" href="/templates/sign_up.html">Sign up/Login</a>
-          <button id="logoutBtn" style="display: none;">Logout</button>
-        </div>
-        <div class="nav-title"><a href="/templates/index.html">PLATFORM name</a></div>
-      </nav>
+  <nav>
+    <div class="nav-title"><a href="/templates/index.html">Volunteer Matcher</a></div>
+
+    <div class="dropdown">
+      <button class="dropbtn">Menu ▾</button>
+      <div class="dropdown-content" id="navLinks">
+        <a href="/templates/dashboard_router.html">Dashboard</a>
+        <a href="/templates/listings.html">Browse Listings</a>
+        <a href="/templates/account_settings.html">Account Settings</a>
+        <a href="/templates/help.html">Help</a>
+        <a href="#" id="logoutLink">Logout</a>
+      </div>
+  </nav>
 
   <main class="dashboard-content">
-    <h1>Welcome, <span id="displayName">...</span></h1>
-
+    <div id="intro-message">
+      <h1>Welcome, <span id="displayName">...</span></h1>
+    </div>
     <section class="dashboard-profile">
-        <h2>Your Volunteer Profile</h2>
-      
-        <form id="profileForm">
-          <label>
-            Bio:
-            <textarea id="bio" placeholder="Tell us about yourself..."></textarea>
-          </label>
-      
-          <label>
-            Location:
-            <input type="text" id="location" placeholder="e.g. Brooklyn, NY" />
-          </label>
-      
-          <label>
-            Interests:
-            <select id="interests" multiple>
-              <option value="environment">Environment</option>
-              <option value="education">Education</option>
-              <option value="animals">Animal Welfare</option>
-              <option value="arts">Arts & Culture</option>
-              <option value="health">Health</option>
-              <option value="tech">Tech</option>
-            </select>
-          </label>
-      
-          <label>
-            Age:
-            <input type="number" id="age" min="13" max="120" />
-          </label>
-      
-          <label>
-            Experience (years):
-            <input type="number" id="experience" min="0" max="50" />
-          </label>
-      
-          <label class="privacy-toggle">
-            Privacy Mode:
-            <input type="checkbox" id="privacyToggle" />
-            <span class="toggle-switch"></span>
-          </label>
-      
-          <button type="submit">Save Changes</button>
-        </form>
-      
-        <section class="volunteer-status">
-          <h3>Your Applications</h3>
-          <ul id="applicationList">
-            <!-- Dynamic list of submitted applications -->
-          </ul>
-        </section>
+      <h2>Your Volunteer Profile</h2>
+
+      <form id="profileForm">
+        <label>
+          Bio:
+          <textarea id="bio" placeholder="Tell us about yourself..."></textarea>
+        </label>
+
+        <label>
+          Location:
+          <input type="text" id="location" placeholder="e.g. Brooklyn, NY" />
+        </label>
+
+        <div class="multi-dropdown">
+          <div class="multi-dropdown-toggle" id="interestToggle">
+            <span id="dropdownLabel">Select Interests</span>
+            <span class="arrow">▾</span>
+          </div>
+          <div class="multi-dropdown-options">
+            <div class="tag-multiselect" id="interestOptions">
+              <label>
+                <input type="checkbox" value="environment" />
+                <span class="tag">Environment</span>
+              </label>
+              <label>
+                <input type="checkbox" value="education" />
+                <span class="tag">Education</span>
+              </label>
+              <label>
+                <input type="checkbox" value="animals" />
+                <span class="tag">Animal Welfare</span>
+              </label>
+              <label>
+                <input type="checkbox" value="arts" />
+                <span class="tag">Arts & Culture</span>
+              </label>
+              <label>
+                <input type="checkbox" value="health" />
+                <span class="tag">Health</span>
+              </label>
+              <label>
+                <input type="checkbox" value="tech" />
+                <span class="tag">Tech</span>
+              </label>
+            </div>
+          </div>
+        </div>
+       
+
+        <label>
+          Age:
+          <input type="number" id="age" min="13" max="120" />
+        </label>
+
+        <label>
+          Experience (years):
+          <input type="number" id="experience" min="0" max="50" />
+        </label>
+
+        <label class="privacy-toggle">
+          Privacy Mode:
+          <input type="checkbox" id="privacyToggle" />
+          <span class="toggle-switch"></span>
+        </label>
+
+        <button type="submit">Save Changes</button>
+      </form>
+
+      <section class="volunteer-status">
+        <h3>Your Applications</h3>
+        <ul id="applicationList">
+          <!-- Dynamic list of submitted applications -->
+        </ul>
       </section>
+    </section>
 
     <div id="volunteerFeatures" style="display:none;">
       <h2>Volunteer Panel</h2>
@@ -78,6 +111,7 @@
 
   </main>
 
-  <script type="module" src="/lib/dashboard/volunteer_dom.js"></script>
+  <script type="module" src="../lib/dashboard/volunteer_dom.js"></script>
 </body>
+
 </html>
