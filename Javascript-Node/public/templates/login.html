@@ -4,16 +4,22 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My JavaScript Web App</title>
-    <link rel="stylesheet" href="../static/style.css" />
-    <link rel="stylesheet" href="../static/register_login.css" />
+    <title>Login</title>
+    <link rel="stylesheet" href="../static/base.css" />
+    <link rel="stylesheet" href="../static/pages/register_login.css" />
 </head>
 
 <body>
     <nav>
-        <div class="nav-login"><a href="/templates/sign_up.html"> Sign up/Login</a></div>
-        <div class="nav-title"><a href="/templates/index.html">PLATFORM name</a></div>
-    </nav>
+        <div class="nav-title"><a href="/templates/index.html">Volunteer Matcher</a></div>
+      
+        <div class="dropdown">
+          <button class="dropbtn">Menu ▾</button>
+          <div class="dropdown-content" id="navLinks">
+            <!-- JS will populate -->
+          </div>
+        </div>
+      </nav>
     <div id="login_div">
         <main class="account_form" id="login_form">
             <div>
@@ -29,15 +35,14 @@
                     </div>
                     <button id="login_submit" type="submit">Login</button>
                     <p id="errorMessage" class="error-message"></p>
-                    <button id = "forgotPassword">Forgot password?</button>
+                    <button id="forgotPassword">Forgot password?</button>
                 </form>
             </div>
         </main>
     </div>
     <!-- Firebase setup -->
-    <script type="module" src="../lib/firebase-config.js"></script>
-    <script type="module" src="../lib/handle_login.js"></script>
-    <script type="module" src="../lib/login_dom.js"></script>
+    <script type="module" src="../lib/common/nav_control.js"></script>
+    <script type="module" src="../lib/login/handle_login.js"></script>
 </body>
 
 </html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+
+  <link rel="stylesheet" href="../static/base.css" />
+  <link rel="stylesheet" href="../static/pages/dashboard.css" />
+</head>
+
+<body>
+  <nav>
+    <div class="nav-login">
+      <a id="loginLink" href="/templates/sign_up.html">Sign up/Login</a>
+      <button id="logoutBtn" style="display: none;">Logout</button>
+    </div>
+    <div class="nav-title"><a href="/templates/index.html">PLATFORM name</a></div>
+  </nav>
+
+
+  <main class="dashboard-content">
+    <h1>Welcome, <span id="displayName">...</span></h1>
+
+   
+  <script type="module" src="/lib/dashboard/dashboard_data.js"></script>
+  <script type="module" src="/lib/dashboard/dashboard_router.js"></script>
+</body>
+
+</html>

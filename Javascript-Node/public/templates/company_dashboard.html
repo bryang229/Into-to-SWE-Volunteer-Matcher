@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Company Dashboard</title>
+  <link rel="stylesheet" href="/static/base.css" />
+  <link rel="stylesheet" href="/static/pages/dashboard.css" />
+</head>
+
+<body>
+  <nav>
+    <div class="nav-title"><a href="/templates/index.html">Volunteer Matcher</a></div>
+    <div class="dropdown">
+      <button class="dropbtn">Menu ▾</button>
+      <div class="dropdown-content" id="navLinks">
+        <!-- JS will populate -->
+      </div>
+    </div>
+  </nav>
+
+  <main class="dashboard-content">
+    <div id="intro-message">
+      <h1>Welcome, <span id="displayName">...</span></h1>
+    </div>
+
+    <section class="dashboard-profile">
+      <h2>Your Company Profile</h2>
+
+      <form id="companyProfileForm">
+        <!-- Company Name (read-only) -->
+        <div class="editable-field">
+          <label for="companyName">Company Name:</label>
+          <div class="field-control">
+            <input type="text" id="companyName" disabled />
+            <span class="privacy-eye" data-field="companyName" title="Click to hide this field from others">🙉</span>
+          </div>
+        </div>
+
+        <!-- Public Email -->
+        <div class="editable-field">
+          <label for="publicEmail">Public Contact Email:</label>
+          <div class="field-control">
+            <input type="email" id="publicEmail" disabled />
+            <button class="edit-btn" data-target="publicEmail">Edit</button>
+            <span class="privacy-eye" data-field="publicEmail" title="Click to hide this field from others">🙉</span>
+          </div>
+          <span class="status-indicator" id="publicEmail-status"></span>
+        </div>
+
+        <!-- Private Email (read-only) -->
+        <div class="editable-field">
+          <label for="privateEmail">Private Admin Email:</label>
+          <div class="field-control">
+            <input type="email" id="privateEmail" disabled />
+            <span class="privacy-eye" data-field="privateEmail" title="Click to hide this field from others">🙉</span>
+          </div>
+        </div>
+
+        <!-- Company Bio -->
+        <div class="editable-field">
+          <label for="companyBio">Company Bio:</label>
+          <div class="field-control">
+            <textarea id="companyBio" disabled placeholder="What does your company do?"></textarea>
+            <button class="edit-btn" data-target="companyBio">Edit</button>
+            <span class="privacy-eye" data-field="companyBio" title="Click to hide this field from others">🙉</span>
+          </div>
+          <span class="status-indicator" id="companyBio-status"></span>
+        </div>
+
+        <!-- Listing Visibility -->
+        <label class="privacy-toggle">
+          Allow Public Listing View:
+          <input type="checkbox" id="listingVisibilityToggle" />
+          <span class="toggle-switch"></span>
+        </label>
+
+        <div id="private-fields-summary">
+          <strong>Private Fields:</strong>
+          <span id="private-fields"></span>
+        </div>
+
+
+        <button type="submit">Update Company Info</button>
+      </form>
+
+      <section class="company-listings">
+        <h3>Your Volunteer Listings</h3>
+        <button id="createListingBtn">+ Create New Listing</button>
+        <ul id="listingList">
+          <!-- Dynamic list of existing listings -->
+        </ul>
+      </section>
+    </section>
+
+    <div id="companyFeatures" style="display:none;">
+      <h2>Company Panel</h2>
+      <p>Manage your listings...</p>
+    </div>
+  </main>
+
+  <script type="module" src="/lib/common/nav_control.js"></script>
+  <script type="module" src="/lib/dashboard/company_dom.js"></script>
+</body>
+</html>

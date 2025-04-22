@@ -1,5 +1,5 @@
 //Imports from firebase-config to authenticate session, reset user passwords, and sign them in
-import { auth, signInWithEmailAndPassword } from './firebase-config.js';
+import { auth, signInWithEmailAndPassword } from '../auth/firebase-config.js';
 
 //Reset password handler (Untested)
 function resetPassword() {
@@ -42,7 +42,7 @@ document.querySelector(".login-form").addEventListener("submit", async (e) => {
         if (!res.ok) throw new Error(data.error || "Unknown error");
 
         if (res.ok) {
-            window.location.href = '/templates/index.html'; //Redirect to dashboard so users can edit details/populate
+            window.location.href = '/templates/dashboard_router.html'; //Redirect to dashboard so users can edit details/populate
         } else {
             document.getElementById('errorMessage').innerText = data.error || 'Login failed';
         }
