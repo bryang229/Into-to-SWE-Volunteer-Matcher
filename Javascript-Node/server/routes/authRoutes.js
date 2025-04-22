@@ -16,6 +16,7 @@ router.get('/check-username', checkUsername);
 router.get('/sessionVerify', verifySession, (req, res) => {
     const { uid, accountType } = req.user;
     res.status(200).json({ uid, accountType });
+    console.log(accountType)
   });
 // GET /api/auth/me
 router.get('/me', verifySession, getPersonalProfile);

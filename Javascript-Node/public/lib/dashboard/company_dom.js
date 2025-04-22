@@ -2,11 +2,16 @@ import { fetchUserData } from './dashboard_data.js';
 import { setupNav } from '../common/nav_control.js';
 
 let cachedUserData;
+
+const listingsSection = document.getElementById("company-listings");
+
+// Set to contain private data 
 const privateFields = new Set();
+
+//Original values before edited by user
 const originalValues = {};
 
-//[Error] TypeError: null is not an object (evaluating 'document.getElementById("listingVisibilityToggle").checked = !!user.listingVisibility') — company_dom.js:101
-//(anonymous function) (company_dom.js:21)
+// Start up sequence ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
@@ -73,6 +78,8 @@ document.querySelectorAll('.privacy-eye').forEach(icon => {
   });
 });
 
+// Event listeners ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 // Submit form
 document.getElementById("companyProfileForm").addEventListener("submit", (e) => {
   e.preventDefault();
@@ -101,10 +108,6 @@ function populateFields(user) {
   document.getElementById("publicEmail").value = user.publicEmail || '';
   document.getElementById("privateEmail").value = user.privateEmail || '';
   document.getElementById("companyBio").value = user.companyBio || '';
-
-
-
-
   // Set eye icon state
   document.querySelectorAll('.privacy-eye').forEach(icon => {
     const fieldId = icon.dataset.field;

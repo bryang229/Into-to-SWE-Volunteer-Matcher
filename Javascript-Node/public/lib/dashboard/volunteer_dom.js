@@ -1,6 +1,6 @@
 import { fetchUserData } from './dashboard_data.js';
 import { setupNav } from '../common/nav_control.js'
-import { verifyCookiesSession } from '../auth/cookies.js';
+
 let cachedUserData;
 
 const applicationList = document.getElementById("applicationList");

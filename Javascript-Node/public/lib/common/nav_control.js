@@ -6,11 +6,17 @@ export async function setupNav(accountType = null) {
 
   try {
     if(!accountType)
-      accountType = await verifyCookiesSession().accountType;
-
+      accountType = (await verifyCookiesSession()).accountType;
+    const isCompany = accountType === 'company';
     navLinks.innerHTML = `
-      <a href="/templates/dashboard_router.html">Dashboard</a>
-      <a href="/templates/listings.html">Browse Listings</a>
+      <a href="/templates/${accountType}_dashboard.html">Dashboard</a>
+      ${isCompany ? 
+        '<a href="/templates/applicants.html">Browse Applications</a>':
+        //Browse listings could be like a search thing
+        `<a href="/templates/index.html">Browse Listings</a>        
+         <a href="/templates/application_portal.html">Check Applications</a>
+        `
+      }
       <a href="/templates/account_settings.html">Account Settings</a>
       <a href="/templates/help.html">Help</a>
       <a href="#" id="logoutLink">Logout</a>

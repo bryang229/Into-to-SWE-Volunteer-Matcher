@@ -96,7 +96,30 @@ const verifySession = async (req, res, next) => {
 
   try {
     const decodedClaims = await admin.auth().verifySessionCookie(sessionCookie, true);
+    
+    // If accountType is missing, try to lookup and patch
+    if (!decodedClaims.accountType) {
+      const uid = decodedClaims.uid;
+
+      let accountType = null;
+
+      const volunteerDoc = await db.collection("Volunteers").doc(uid).get();
+      if (volunteerDoc.exists) {
+        accountType = "volunteer";
+      } else {
+        const companyDoc = await db.collection("companies").doc(uid).get();
+        if (companyDoc.exists) accountType = "company";
+      }
+
+      // Set custom claim so it's correct in future sessions
+      if (accountType) {
+        await admin.auth().setCustomUserClaims(uid, { accountType });
+        decodedClaims.accountType = accountType;
+      }
+    }
+    
     req.user = decodedClaims; // Now you have uid and accountType
+    console.log(req.user.accountType)
     next();
   } catch (err) {
     console.log('failed')
