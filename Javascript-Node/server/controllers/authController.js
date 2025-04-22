@@ -137,10 +137,8 @@ const getUserInfo = async (req, res) => {
     }
 
     // Then check volunteer
-    const volunteerSnap = await db.collection('Volunteers')
-      .where('hashedEmail', '==', sha256(userRecord.email))
-      .limit(1)
-      .get();
+    const volunteerSnap = await db.collection('Volunteers').doc(uid).get();
+
 
     if (!volunteerSnap.empty) {
       return res.json({ role: 'volunteer', uid });
