@@ -112,8 +112,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         const userRole = (userData.role || '').toLowerCase().trim();
 
         if (userRole === 'volunteer') {
-            console.log('Volunteer detected - redirecting to listings');
-            window.location.replace("/templates/listings.html");
+            console.log('Volunteer detected - redirecting to home page');
+            window.location.replace("/templates/index.html");
             return;
         }
 

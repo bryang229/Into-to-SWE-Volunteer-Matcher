@@ -1,5 +1,5 @@
 //Imports from firebase-config to authenticate session and create a new user
-import { auth, createUserWithEmailAndPassword } from './firebase-config.js';
+import { auth, createUserWithEmailAndPassword } from '../auth/firebase-config.js';
 //Exporting registerVolunteer handler to dom handler signup_dom.js
 export async function registerVolunteer(email, password, username, fullname) {
   try { 
