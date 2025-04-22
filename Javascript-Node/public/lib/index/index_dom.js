@@ -1,4 +1,6 @@
 import { renderSmallListing, renderPopUpListing } from '../listings/render_listing.js';
+import { setupNav } from '../common/nav_control.js';
+
 
 //Loads content onto DOM once page is loaded
 document.addEventListener("DOMContentLoaded", async () => {
@@ -18,6 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       container.appendChild(card);
     });
 
+    await setupNav();
   } catch (err) {
     container.innerHTML = "<p>Failed to load listings. Please try again later.</p>";
     console.error("Error fetching listings:", err);

@@ -1,27 +1,17 @@
-const logoutBtn = document.getElementById("logoutBtn");
-const loginLink = document.getElementById("loginLink");
-const hasSession = document.cookie.includes("session");
-
-console.log("Cookie:", document.cookie);
-
-if (hasSession && logoutBtn && loginLink) {
-logoutBtn.style.display = "inline-block";
-loginLink.style.display = "none";
+export async function logout(){
+    await fetch("/api/logout", { method: "POST" });
+    document.cookie = "session=; Max-Age=0; path=/";
+    location.reload();
 }
 
-if (logoutBtn) {
-logoutBtn.addEventListener("click", async () => {
-// console.log("Logout button clicked");
-await fetch("/api/logout", { method: "POST" });
-document.cookie = "session=; Max-Age=0; path=/";
-location.reload();
-});
-}
-
-const checkCookieSession = () => {
-
-}
-
-const verifyCookiesSession = () => {
-    
+export async function verifyCookiesSession() {
+    try {
+        let res = await fetch('/api/sessionVerify');
+        res_body = await res.json();
+        return {
+            accountType : res_body.accountType
+        }
+    } catch(err) {
+        return {"message" : Error("Failed to verify session, user could be logged out")}
+    }
 }

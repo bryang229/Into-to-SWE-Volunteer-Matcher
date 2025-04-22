@@ -6,17 +6,54 @@ const sessionLogin = async (req, res) => {
 
   try {
     const sessionCookie = await admin.auth().createSessionCookie(idToken, { expiresIn });
+
+    const decodedIdToken = await admin.auth().verifyIdToken(idToken);
+    const uid = decodedIdToken.uid;
+
+    // Step 1: Check if accountType exists in custom claims
+    let accountType = decodedIdToken.accountType;
+
+    // Step 2: If missing, fallback to Firestore lookup
+    if (!accountType) {
+      const volunteerDoc = await db.collection("Volunteers").doc(uid).get();
+      if (volunteerDoc.exists) {
+        accountType = "volunteer";
+      } else {
+        const companyDoc = await db.collection("companies").doc(uid).get();
+        if (companyDoc.exists) accountType = "company";
+      }
+
+      // Optionally: set custom claim now to avoid next time needing lookup
+      if (accountType) {
+        await admin.auth().setCustomUserClaims(uid, { accountType });
+      }
+    }
+
+    if (!accountType) {
+      return res.status(403).json({ error: "No matching user record found." });
+    }
+
+    // Set session + accountType cookies
     res.cookie('session', sessionCookie, {
       maxAge: expiresIn,
-      httpOnly: false,   //false for testing, true for production
+      httpOnly: false, // set to true in prod
       secure: false,
-      //secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
     });
-    console.log("Cookie set with:", sessionCookie);
-    res.status(200).json({ message: 'Login successful' });
+
+    res.cookie('accountType', accountType, {
+      maxAge: expiresIn,
+      httpOnly: false,
+      secure: false,
+      sameSite: 'lax',
+      path: '/',
+    });
+
+    res.status(200).json({ message: "Session established", accountType });
+
   } catch (error) {
+    console.error("Session login failed:", error.message);
     res.status(401).json({ error: error.message });
   }
 };

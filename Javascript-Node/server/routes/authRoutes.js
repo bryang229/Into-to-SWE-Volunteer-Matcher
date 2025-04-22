@@ -13,8 +13,10 @@ router.post('/sessionLogin', sessionLogin);
 //GET /api/check-username?username=query
 router.get('/check-username', checkUsername);
 //GET /api/sessionVerify
-router.get('/sessionVerify', verifySession);
-
+router.get('/sessionVerify', verifySession, (req, res) => {
+    const { uid, accountType } = req.user;
+    res.status(200).json({ uid, accountType });
+  });
 // GET /api/auth/me
 router.get('/me', verifySession, getPersonalProfile);
 
