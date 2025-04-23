@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My JavaScript Web App</title>
+  <title>Sign Up!</title>
   <link rel="stylesheet" href="../static/base.css" />
   <link rel="stylesheet" href="../static/pages/register_login.css" />
 
@@ -12,11 +12,18 @@
 </head>
 
 <body>
-  <nav>
-    <div class="nav-login"> Sign up/Login</div>
-    <div class="nav-title"><a href="/templates/index.html">PLATFORM name</a></div>
 
-  </nav>
+  <nav>
+  <div class="nav-title"><a href="/templates/index.html">Volunteer Matcher</a></div>
+
+  <div class="dropdown">
+    <button class="dropbtn">Menu ▾</button>
+    <div class="dropdown-content" id="navLinks">
+      <!-- JS will populate -->
+    </div>
+  </div>
+</nav>
+
   <div id="sign_up_div">
     <main class="account_form" id="sign_up_form">
       <div>
@@ -42,7 +49,7 @@
             <small id="username-feedback"></small>
           </div>
 
-          <div class="form-group" id = "volunteerEmail">
+          <div class="form-group" id="volunteerEmail">
             <label for="email">Email Address</label>
             <input type="email" id="email" required />
           </div>
@@ -86,7 +93,6 @@
   <!-- JS Imports -->
   <!-- Importing CryptoJS using a CDN so that we can hash sensitive data -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-
   <!-- DOM handling -->
   <script type="module" src="../lib/sign_up/signup_dom.js"></script>
 

@@ -67,7 +67,7 @@ document.querySelector(".signup-form").addEventListener("submit", async (e) => {
 
     let result; 
     if (accountType === "volunteer") { 
-        const email = document.getElementById("email").value;  //getting volunteer specific data
+        const email = document.getElementById("email").value.trim();  //getting volunteer specific data
         result = await registerVolunteer(email, password, username, fullname); //using handler
     } else {
         //getting company specific data

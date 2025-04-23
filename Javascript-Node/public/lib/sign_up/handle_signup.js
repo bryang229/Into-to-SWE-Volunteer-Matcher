@@ -8,7 +8,7 @@ export async function registerVolunteer(email, password, username, fullname) {
     //Store uid for document ID
     const uid = userCredential.user.uid;
     //Store email as a hashed string
-    const emailHash = CryptoJS.SHA256(email).toString();
+    const emailHash = CryptoJS.SHA256(email).toString(); // This is problematic, causes double hashing of emails, look into removing
     //Send data to backend for handling
     const res = await fetch("/api/volunteers/register", {
       method: "POST",

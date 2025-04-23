@@ -42,7 +42,7 @@ document.querySelector(".login-form").addEventListener("submit", async (e) => {
         if (!res.ok) throw new Error(data.error || "Unknown error");
 
         if (res.ok) {
-            window.location.href = '/templates/index.html'; //Redirect to dashboard so users can edit details/populate
+            window.location.href = '/templates/dashboard_router.html'; //Redirect to dashboard so users can edit details/populate
         } else {
             document.getElementById('errorMessage').innerText = data.error || 'Login failed';
         }

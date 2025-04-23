@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Volunteer Dashboard</title>
+  <link rel="stylesheet" href="../static/base.css" />
+  <link rel="stylesheet" href="../static/pages/dashboard.css" />
+</head>
+
+<body>
+  <nav>
+    <div class="nav-title"><a href="/templates/index.html">Volunteer Matcher</a></div>
+
+    <div class="dropdown">
+      <button class="dropbtn">Menu ▾</button>
+      <div class="dropdown-content" id="navLinks">
+        <!-- JS will populate -->
+      </div>
+    </div>
+  </nav>
+
+  <main class="dashboard-content">
+    <div id="intro-message">
+      <h1>Welcome, <span id="displayName">...</span></h1>
+    </div>
+    <section class="dashboard-profile">
+      <h2>Your Volunteer Profile</h2>
+
+      <form id="profileForm">
+        <!-- Bio -->
+        <div class="editable-field">
+          <label for="bio">Bio:</label>
+          <div class="field-control">
+            <textarea id="bio" disabled></textarea>
+            <button class="edit-btn" data-target="bio">Edit</button>
+        
+            <span class="privacy-eye" data-field="bio" title="Click to hide this field from others">
+              🙉
+            </span>
+          </div>
+          <span class="status-indicator" id="bio-status"></span>
+        </div>
+
+        <!-- Location -->
+        <div class="editable-field">
+          <label for="location">Location:</label>
+          <div class="field-control">
+            <input type="text" id="location" disabled placeholder="e.g. Brooklyn, NY" />
+            <button class="edit-btn" data-target="location">Edit</button>
+            <span class="privacy-eye" data-field="location" title="Click to hide this field from others">
+              🙉
+            </span>
+          </div>
+          <span class="status-indicator" id="location-status"></span>
+        </div>
+
+        <!-- Age -->
+        <div class="editable-field">
+          <label for="age">Age:</label>
+          <div class="field-control">
+            <input type="number" id="age" disabled min="13" max="120" />
+            <button class="edit-btn" data-target="age">Edit</button>
+            <span class="privacy-eye" data-field="age" title="Click to hide this field from others">
+              🙉
+            </span>
+          </div>
+          <span class="status-indicator" id="age-status"></span>
+        </div>
+
+        <!-- Experience -->
+        <div class="editable-field">
+          <label for="experience">Experience (years):</label>
+          <div class="field-control">
+            <input type="number" id="experience" disabled min="0" max="50" />
+            <button class="edit-btn" data-target="experience">Edit</button>
+            <span class="privacy-eye" data-field="experience" title="Click to hide this field from others">
+              🙉
+            </span>
+          </div>
+          <span class="status-indicator" id="experience-status"></span>
+        </div>
+
+        <!-- Interests -->
+        <label for="interestOptions">Interests:</label>
+        <div class="multi-dropdown">
+          <div class="multi-dropdown-toggle" id="interestToggle">
+            <span id="dropdownLabel">Select Interests</span>
+            <span class="arrow">▾</span>
+          </div>
+          <div class="multi-dropdown-options">
+            <div class="tag-multiselect" id="interestOptions">
+              <label>
+                <input type="checkbox" value="environment" />
+                <span class="tag">Environment</span>
+              </label>
+              <label>
+                <input type="checkbox" value="education" />
+                <span class="tag">Education</span>
+              </label>
+              <label>
+                <input type="checkbox" value="animals" />
+                <span class="tag">Animal Welfare</span>
+              </label>
+              <label>
+                <input type="checkbox" value="arts" />
+                <span class="tag">Arts & Culture</span>
+              </label>
+              <label>
+                <input type="checkbox" value="health" />
+                <span class="tag">Health</span>
+              </label>
+              <label>
+                <input type="checkbox" value="tech" />
+                <span class="tag">Tech</span>
+              </label>
+            </div>
+          </div>
+          <span class="privacy-eye" data-field="interestsOptions" title="Click to hide this field from others">
+            🙉
+          </span>
+        </div>
+        <div id="private-fields-summary">
+          <strong>Private Fields:</strong>
+          <span id="private-fields"></span>
+        </div>
+
+        <button type="submit">Save Changes</button>
+      </form>
+
+      <section class="volunteer-status">
+        <h3>Your Applications</h3>
+        <ul id="applicationList">
+          <!-- Dynamic list of submitted applications -->
+        </ul>
+      </section>
+    </section>
+
+    <div id="volunteerFeatures" style="display:none;">
+      <h2>Volunteer Panel</h2>
+      <p>Apply to new opportunities...</p>
+    </div>
+
+  </main>
+  <script type="module" src="../lib/dashboard/volunteer_dom.js"></script>
+</body>
+
+</html>

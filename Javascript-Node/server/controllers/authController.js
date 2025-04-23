@@ -8,17 +8,54 @@ const sessionLogin = async (req, res) => {
 
   try {
     const sessionCookie = await admin.auth().createSessionCookie(idToken, { expiresIn });
+
+    const decodedIdToken = await admin.auth().verifyIdToken(idToken);
+    const uid = decodedIdToken.uid;
+
+    // Step 1: Check if accountType exists in custom claims
+    let accountType = decodedIdToken.accountType;
+
+    // Step 2: If missing, fallback to Firestore lookup
+    if (!accountType) {
+      const volunteerDoc = await db.collection("Volunteers").doc(uid).get();
+      if (volunteerDoc.exists) {
+        accountType = "volunteer";
+      } else {
+        const companyDoc = await db.collection("companies").doc(uid).get();
+        if (companyDoc.exists) accountType = "company";
+      }
+
+      // Optionally: set custom claim now to avoid next time needing lookup
+      if (accountType) {
+        await admin.auth().setCustomUserClaims(uid, { accountType });
+      }
+    }
+
+    if (!accountType) {
+      return res.status(403).json({ error: "No matching user record found." });
+    }
+
+    // Set session + accountType cookies
     res.cookie('session', sessionCookie, {
       maxAge: expiresIn,
-      httpOnly: false,   //false for testing, true for production
+      httpOnly: false, // set to true in prod
       secure: false,
-      //secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
     });
-    console.log("Cookie set with:", sessionCookie);
-    res.status(200).json({ message: 'Login successful' });
+
+    res.cookie('accountType', accountType, {
+      maxAge: expiresIn,
+      httpOnly: false,
+      secure: false,
+      sameSite: 'lax',
+      path: '/',
+    });
+
+    res.status(200).json({ message: "Session established", accountType });
+
   } catch (error) {
+    console.error("Session login failed:", error.message);
     res.status(401).json({ error: error.message });
   }
 };
@@ -56,11 +93,87 @@ const checkUsername = async (req, res) => {
   }
 };
 
+//Verifies cookie session
+const verifySession = async (req, res, next) => {
+  const sessionCookie = req.cookies.session || '';
+
+  try {
+    const decodedClaims = await admin.auth().verifySessionCookie(sessionCookie, true);
+
+    // If accountType is missing, try to lookup and patch
+    if (!decodedClaims.accountType) {
+      const uid = decodedClaims.uid;
+
+      let accountType = null;
+
+      const volunteerDoc = await db.collection("Volunteers").doc(uid).get();
+      if (volunteerDoc.exists) {
+        accountType = "volunteer";
+      } else {
+        const companyDoc = await db.collection("companies").doc(uid).get();
+        if (companyDoc.exists) accountType = "company";
+      }
+
+      // Set custom claim so it's correct in future sessions
+      if (accountType) {
+        await admin.auth().setCustomUserClaims(uid, { accountType });
+        decodedClaims.accountType = accountType;
+      }
+    }
+
+    req.user = decodedClaims; // Now you have uid and accountType
+    console.log(req.user.accountType, "verify session end")
+    next();
+  } catch (err) {
+    console.log('failed')
+    res.status(401).json({ error: "Unauthorized" });
+  }
+};
+
+// Returns user info for dashboard  
+const getPersonalProfile = async (req, res) => {
+  const { uid, accountType } = req.user;
+
+  let profileDoc;
+  let resolvedType = accountType;
+
+  if (!accountType) {
+    // For older accounts with no custom claim
+    resolvedType = "volunteer";
+    profileDoc = await db.collection("Volunteers").doc(uid).get();
+
+    if (!profileDoc.exists) {
+      profileDoc = await db.collection("companies").doc(uid).get();
+      resolvedType = "company";
+
+      if (!profileDoc.exists) {
+        console.log("Error: user not found");
+        return res.status(404).json({ error: "User not found" });
+      }
+    }
+  } else {
+    // Newer users with accountType claim
+    const collection = accountType === "volunteer" ? "Volunteers" : "companies";
+    profileDoc = await db.collection(collection).doc(uid).get();
+
+    if (!profileDoc.exists) {
+      console.log("Error: user not found");
+      return res.status(404).json({ error: "User not found" });
+    }
+  }
+
+  res.json({
+    uid,
+    accountType: resolvedType,
+    ...profileDoc.data()
+  });
+};
+
 const logout = async (req, res) => {
   try {
     const sessionCookie = req.cookies.session || '';
     console.log("[LOGOUT] Attempt with session:", sessionCookie);
-    
+
     if (sessionCookie) {
       try {
         // Try to verify the session cookie
@@ -81,7 +194,7 @@ const logout = async (req, res) => {
       path: '/',
       maxAge: 0
     });
-    
+
     console.log("[LOGOUT] Cookie cleared");
     return res.status(200).json({ message: "Successfully logged out" });
   } catch (err) {
@@ -131,7 +244,7 @@ const getUserInfo = async (req, res) => {
       const companyData = companySnap.data();
       return res.json({
         role: 'company',
-        accountType: 'company', 
+        accountType: 'company',
         uid,
         companyName: companyData.companyName
       });
@@ -156,7 +269,7 @@ const getUserInfo = async (req, res) => {
       path: '/',
       maxAge: 0
     });
-    return res.status(401).json({ 
+    return res.status(401).json({
       error: 'Session invalid',
       details: process.env.NODE_ENV === 'development' ? err.message : 'Authentication failed'
     });
@@ -164,8 +277,10 @@ const getUserInfo = async (req, res) => {
 };
 
 module.exports = {
-    sessionLogin,
-    checkUsername,
-    logout,
-    getUserInfo
+  sessionLogin,
+  checkUsername,
+  getUserInfo,
+  verifySession,
+  getPersonalProfile,
+  logout
 };

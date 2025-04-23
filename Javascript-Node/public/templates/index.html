@@ -1,33 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My JavaScript Web App</title>
+  <title>Find Opportunities!</title>
   <link rel="stylesheet" href="../static/base.css" />
   <link rel="stylesheet" href="../static/pages/listings.css" />
-  <script src="../lib/listings/render_listing.js" defer></script>
 </head>
-<body>
-  <nav>
-    <div class="nav-login" id="nav-controls">
-      <a id="loginLink" href="/templates/sign_up.html">Sign up/Login</a>
-      <button id="logoutBtn" style="display: none;">Logout</button>
-      <a id="createListingBtn" href="/templates/create_listing.html" style="display: none;">Create Listing</a>
 
-    </div>
-    <div class="nav-title"><a href="/templates/index.html">PLATFORM name</a></div>
-  </nav>
+<body class="listing-page">
+  <div class="listing-grid-wrapper">
+    <nav>
+      <div class="nav-title"><a href="/templates/index.html">Volunteer Matcher</a></div>
 
-  <h1>Upcoming Volunteer Opportunities</h1>
-  <section id="listing-container" class="listing-grid"></section>
+      <div class="dropdown">
+        <button class="dropbtn">Menu ▾</button>
+        <div class="dropdown-content" id="navLinks">
+          <!-- JS will populate -->
+        <a id="createListingBtn" href="/templates/create_listing.html" style="display: none;">Create Listing</a> 
+        </div>
+      </div>
+    </nav>
+
+    <h1>Upcoming Volunteer Opportunities</h1>
+
+    <section id="listing-container" class="listing-grid"></section>
+  </div>
+
 
   
   <!-- All cookie logic runs after DOM is ready -->
-  <script type="module" src="../lib/common/nav_control.js"></script>
+  <script type="module" src="../lib/index/index_dom.js"></script>
 
-  
-  
-  
 </body>
+
 </html>
