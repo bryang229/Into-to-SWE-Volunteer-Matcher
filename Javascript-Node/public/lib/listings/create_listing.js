@@ -62,8 +62,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     console.log('Data check:', {
                         data: data,
                         type: typeof data,
-                        hasRole: 'role' in data,
-                        role: data?.role,
+                        hasRole: 'accountType' in data,
+                        accountType: data?.accountType,
                         keys: Object.keys(data)
                     });
 
@@ -71,10 +71,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                         throw new Error('Empty data from server');
                     }
 
-                    // Check if role exists before accessing
-                    if (!('role' in data)) {
-                        console.error('Missing role in data:', data);
-                        throw new Error('No role found in user data');
+                    // Check if accountType exists before accessing
+                    if (!('accountType' in data)) {
+                        console.error('Missing accountType in data:', data);
+                        throw new Error('No accountType found in user data');
                     }
 
                     return data;
@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
 
                 if (retries <= 0) {
-                    document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                    console.warn("Session validation failed; will redirect but not delete cookie yet.");
                     throw err;
                 }
                 retries--;
@@ -102,14 +102,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
         const userData = await checkAuth();
         console.log('Final user data for redirect decision:', {
-            role: userData.role,
-            normalizedRole: userData.role?.toLowerCase?.(),
-            isVolunteer: userData.role === 'volunteer',
-            isCompany: userData.role === 'company'
+            accountType: userData.accountType,
+            normalizedRole: userData.accountType?.toLowerCase?.(),
+            isVolunteer: userData.accountType === 'volunteer',
+            isCompany: userData.accountType === 'company'
         });
 
-        // Update role checks to be more explicit
-        const userRole = (userData.role || '').toLowerCase().trim();
+        // Update accountType checks to be more explicit
+        const userRole = (userData.accountType || '').toLowerCase().trim();
 
         if (userRole === 'volunteer') {
             console.log('Volunteer detected - redirecting to home page');
@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.log('Attempted to set company name to:', companyName);
             console.log('Company field value after setting:', companyField.value);
         } else {
-            console.log('Unknown role detected - redirecting to index');
+            console.log('Unknown accountType detected - redirecting to index');
             window.location.replace("/templates/index.html");
             return;
         }
