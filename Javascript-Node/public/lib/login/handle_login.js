@@ -33,7 +33,7 @@ document.querySelector(".login-form").addEventListener("submit", async (e) => {
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include', // <--- CRITICAL FOR COOKIES
             body: JSON.stringify({ idToken }), // must be this exact shape
-            
+
         });
         console.log("Server responded with:", res.status);
 
@@ -42,6 +42,9 @@ document.querySelector(".login-form").addEventListener("submit", async (e) => {
         if (!res.ok) throw new Error(data.error || "Unknown error");
 
         if (res.ok) {
+            setTimeout(() => {
+                window.location.href = '/templates/dashboard_router.html';
+            }, 100);
             window.location.href = '/templates/dashboard_router.html'; //Redirect to dashboard so users can edit details/populate
         } else {
             document.getElementById('errorMessage').innerText = data.error || 'Login failed';

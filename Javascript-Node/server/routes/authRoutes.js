@@ -3,6 +3,7 @@ const router = express.Router();
 const { sessionLogin,
         checkUsername,
         verifySession,
+        getUserInfo,
         getPersonalProfile,
         logout
     } = require('../controllers/authController');
