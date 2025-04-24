@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <title>Company Dashboard</title>
-  <link rel="stylesheet" href="/static/base.css" />
-  <link rel="stylesheet" href="/static/pages/dashboard.css" />
+  <link rel="stylesheet" href="../../static/base.css" />
+  <link rel="stylesheet" href="../../static/pages/dashboard.css" />
 </head>
 
 <body>
@@ -85,7 +85,7 @@
 
       <section class="company-listings">
         <h3>Your Volunteer Listings</h3>
-        <a href = "../templates/create_listing.html"> <button> + Create New Listing</button> </a>
+        <a href = "/templates/company/create_listing.html"> <button> + Create New Listing</button> </a>
         <ul id="listingList">
           <!-- Dynamic list of existing listings -->
         </ul>
@@ -98,7 +98,7 @@
     </div>
   </main>
 
-  <script type="module" src="/lib/common/nav_control.js"></script>
-  <script type="module" src="/lib/dashboard/company_dom.js"></script>
+  <script type="module" src="../../lib/common/nav_control.js"></script>
+  <script type="module" src="../../lib/dashboard/company_dom.js"></script>
 </body>
 </html>

@@ -90,7 +90,7 @@ document.querySelector(".signup-form").addEventListener("submit", async (e) => {
         alert("Registered successfully!");
         // Delay a little for the user to see it (optional)
         setTimeout(() => {
-            window.location.href = "/templates/login.html";
+            window.location.href = "/templates/auth/login.html";
         }, 1000);
     } else {
         alert("Error sign up failed " + result.message);

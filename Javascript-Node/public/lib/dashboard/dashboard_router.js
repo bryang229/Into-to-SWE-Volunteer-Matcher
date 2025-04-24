@@ -5,11 +5,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         const cachedUserData = await fetchUserData();
         if (cachedUserData.accountType === "volunteer") {
             setTimeout(() => {
-                window.location.href = "/templates/volunteer_dashboard.html";
+                window.location.href = "/templates/volunteer/volunteer_dashboard.html";
             }, 200);
         } else if (cachedUserData.accountType === "company") {
             setTimeout(() => {
-                window.location.href = "/templates/company_dashboard.html";
+                window.location.href = "/templates/company/company_dashboard.html";
             }, 200);
         }
 
@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error(err);
 
         setTimeout(() => {
-            window.location.href = "/templates/login.html";
+            window.location.href = "/templates/auth/login.html";
         }, 10000);
     }
 

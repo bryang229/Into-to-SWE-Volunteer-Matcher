@@ -26,14 +26,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupNav(cachedUserData.accountType);
 
     if (cachedUserData.accountType === "company")
-      window.location.href = "/templates/company_dashboard.html";
+      window.location.href = "/templates/company/company_dashboard.html";
     populateFields(cachedUserData);
 
   } catch (err) {
     console.error(err);
 
     setTimeout(() => {
-      window.location.href = "/templates/login.html";
+      window.location.href = "/templates/auth/login.html";
     }, 10000);
   }
 });

@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupNav(cachedUserData.accountType);
 
     if (cachedUserData.accountType === "volunteer") {
-      window.location.href = "/templates/volunteer_dashboard.html";
+      window.location.href = "/templates/volunter/volunteer_dashboard.html";
       return;
     }
 
@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (err) {
     console.error(err);
     setTimeout(() => {
-      window.location.href = "/templates/login.html";
+      window.location.href = "/templates/auth/login.html";
     }, 10000);
   }
 });

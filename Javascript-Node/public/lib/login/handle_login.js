@@ -43,9 +43,8 @@ document.querySelector(".login-form").addEventListener("submit", async (e) => {
 
         if (res.ok) {
             setTimeout(() => {
-                window.location.href = '/templates/dashboard_router.html';
+                window.location.href = '/templates/auth/dashboard_router.html';
             }, 100);
-            window.location.href = '/templates/dashboard_router.html'; //Redirect to dashboard so users can edit details/populate
         } else {
             document.getElementById('errorMessage').innerText = data.error || 'Login failed';
         }

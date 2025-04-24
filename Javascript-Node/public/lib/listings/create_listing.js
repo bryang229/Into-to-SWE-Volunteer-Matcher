@@ -15,7 +15,7 @@ if (!logoutBtn) {
             console.log('Logout response:', res);
             if (res.ok) {
                 document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                window.location.href = '/templates/login.html';
+                window.location.href = '/templates/auth/login.html';
             } else {
                 alert('Logout failed: ' + res.statusText);
             }

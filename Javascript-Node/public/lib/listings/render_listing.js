@@ -31,7 +31,7 @@ export function renderPopUpListing(listing_data, card, loggedIn) {
       <p><strong>Tags:</strong> ${listing_data.tags.join(", ")}</p>
       ${loggedIn
         ? `<button onclick="alert('Apply feature coming soon')">Apply Now</button>`
-        : `<p>Please <a href="/templates/login.html">log in</a> to apply.</p>`
+        : `<p>Please <a href="/templates/auth/login.html">log in</a> to apply.</p>`
       }
       <button onclick="this.parentElement.parentElement.remove()">Close</button>
     </div>
