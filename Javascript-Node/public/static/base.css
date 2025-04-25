@@ -156,3 +156,20 @@ a {
   }
 }
 
+/* back button */
+.back-button-container {
+  margin: 1rem 2rem;
+}
+
+.back-btn {
+  padding: 0.5rem 1.2rem;
+  background-color: #f4f4f4;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.back-btn:hover {
+  background-color: #e2e2e2;
+}

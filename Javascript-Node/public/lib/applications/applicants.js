@@ -1,7 +1,11 @@
+import { setupNav } from '../common/nav_control.js';
+
 document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
   const listingId = params.get("listingId");
   const container = document.querySelector(".container");
+
+  await setupNav();
 
   if (!listingId) {
     container.innerHTML = "<p>Error: Missing listing ID.</p>";

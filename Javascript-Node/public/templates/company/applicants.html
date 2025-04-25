@@ -4,9 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Application Review</title>
+    <link rel="stylesheet" href="../../static/base.css">
     <link rel="stylesheet" href="../../static/pages/applicants.css">
 </head>
 <body>
+
+    <nav>
+        <div class="nav-title"><a href="/templates/index.html">Volunteer Matcher</a></div>
+        <div class="dropdown">
+          <button class="dropbtn">Menu ▾</button>
+          <div class="dropdown-content" id="navLinks">
+            <!-- JS will populate -->
+          </div>
+        </div>
+      </nav>
+
     <div class="container">
         <h1>Applications</h1>
         <div class="application" id="application1">
@@ -22,6 +34,6 @@
             <button class="deny-btn" onclick="handleDecision('application2', 'denied')">Deny</button>
         </div>      
 </body>
-<script src="../../lib/applications/applicants.js"></script>
+<script type="module" src="../../lib/applications/applicants.js"></script>
 </div>
 </html>
