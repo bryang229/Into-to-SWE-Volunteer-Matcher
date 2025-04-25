@@ -130,6 +130,38 @@ const checkUsername = async (req, res) => {
   }
 };
 
+// gets volunteers applied application data
+const getApplications = async (req, res) => {
+  const user = req.user;
+
+  if (!user || !user.uid) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  const volunteerDoc = await db.collection("volunteers").doc(user.uid).get();
+  if (!volunteerDoc.exists) {
+    return res.status(404).json({ error: "Volunteer profile not found" });
+  }
+
+  const data = volunteerDoc.data();
+  const appsArray = data.applications || [];
+
+  if (appsArray.length === 0) {
+    return res.status(200).json([]);
+  }
+
+  // Fetch all corresponding Applications
+  const promises = appsArray.map(app => 
+    db.collection("Applications").doc(app.applicationId).get()
+  );
+  const appSnapshots = await Promise.all(promises);
+
+  const applications = appSnapshots
+    .filter(doc => doc.exists)
+    .map(doc => ({ id: doc.id, ...doc.data() }));
+
+  res.status(200).json(applications);
+};
 
 //Export functions so they can be used in routers to link the function to the route!
 module.exports = {
@@ -138,5 +170,6 @@ module.exports = {
   getProfile,
   getVolunteers,
   getVolunteerByUsername,
-  checkUsername
+  checkUsername,
+  getApplications
 };

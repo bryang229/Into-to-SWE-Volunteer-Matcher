@@ -162,11 +162,41 @@ const updateStatus = async (req, res) => {
   res.status(200).json({ message: "Status updated" });
 };
 
+
+const revealInfo = async (req, res) => {
+  const { applicationId } = req.body;
+  const user = req.user;
+
+  if (!applicationId) {
+    return res.status(400).json({ error: "Missing application ID." });
+  }
+
+  const appRef = db.collection("Applications").doc(applicationId);
+  const appDoc = await appRef.get();
+
+  if (!appDoc.exists) {
+    return res.status(404).json({ error: "Application not found." });
+  }
+
+  const app = appDoc.data();
+  if (app.applicantUid !== user.uid) {
+    return res.status(403).json({ error: "You are not authorized to modify this application." });
+  }
+
+  await appRef.update({
+    revealedInfo: true
+  });
+
+  res.status(200).json({ message: "Info revealed successfully." });
+};
+
+
 module.exports = {
   apply,
   getApplicationData,
   editApplicationData,
   getApplicants,
   requestAccess,
-  updateStatus
+  updateStatus,
+  revealInfo
 }

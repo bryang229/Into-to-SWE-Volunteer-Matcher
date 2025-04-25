@@ -6,7 +6,8 @@ const {
     editApplicationData,
     getApplicants,
     requestAccess,
-    updateStatus
+    updateStatus,
+    revealInfo
 } = require('../controllers/applicationsController');
 const { verifySession } = require("../controllers/authController")
 //Returns all listings
@@ -22,5 +23,8 @@ router.get("/by-listing", getApplicants);
 router.post("/request-access", verifySession, requestAccess);
 //PATCH /api/applications/status
 router.patch("/status", verifySession, updateStatus);
+//POST /api/applications/reveal-info
+router.post("/reveal-info", verifySession, revealInfo);
+
 
 module.exports = router;

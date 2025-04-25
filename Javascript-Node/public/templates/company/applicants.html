@@ -1,39 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Application Review</title>
-    <link rel="stylesheet" href="../../static/base.css">
-    <link rel="stylesheet" href="../../static/pages/applicants.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Application Review</title>
+  <link rel="stylesheet" href="../../static/base.css">
+  <link rel="stylesheet" href="../../static/pages/applicants.css">
 </head>
+
 <body>
 
-    <nav>
-        <div class="nav-title"><a href="/templates/index.html">Volunteer Matcher</a></div>
-        <div class="dropdown">
-          <button class="dropbtn">Menu ▾</button>
-          <div class="dropdown-content" id="navLinks">
-            <!-- JS will populate -->
-          </div>
-        </div>
-      </nav>
+  <nav>
+    <div class="nav-title"><a href="/templates/index.html">Volunteer Matcher</a></div>
+    <div class="dropdown">
+      <button class="dropbtn">Menu ▾</button>
+      <div class="dropdown-content" id="navLinks">
+        <!-- JS will populate -->
+      </div>
+    </div>
+  </nav>
 
-    <div class="container">
-        <h1>Applications</h1>
-        <div class="application" id="application1">
-            <h2>Applicant: John Doe</h2>
-            <p>Position: Software Engineer</p>
-            <button class="accept-btn" onclick="handleDecision('application1', 'accepted')">Accept</button>
-            <button class="deny-btn" onclick="handleDecision('application1', 'denied')">Deny</button>
-        </div>
-        <div class="application" id="application2">
-            <h2>Applicant: Jane Smith</h2>
-            <p>Position: Data Analyst</p>
-            <button class="accept-btn" onclick="handleDecision('application2', 'accepted')">Accept</button>
-            <button class="deny-btn" onclick="handleDecision('application2', 'denied')">Deny</button>
-        </div>      
+  <label for="statusSort">Sort by Status:</label>
+  <select id="statusSort">
+    <option value="all">All</option>
+    <option value="waiting for review">Waiting for Review</option>
+    <option value="in communication">In Communication</option>
+    <option value="accepted">Accepted</option>
+    <option value="denied">Denied</option>
+  </select>
+
+  <div class="container">
+    <h1>Applications</h1>
+    <div class="application" id="application1">
+      <h2>Applicant: John Doe</h2>
+      <p>Position: Software Engineer</p>
+      <button class="accept-btn" onclick="handleDecision('application1', 'accepted')">Accept</button>
+      <button class="deny-btn" onclick="handleDecision('application1', 'denied')">Deny</button>
+    </div>
+    <div class="application" id="application2">
+      <h2>Applicant: Jane Smith</h2>
+      <p>Position: Data Analyst</p>
+      <button class="accept-btn" onclick="handleDecision('application2', 'accepted')">Accept</button>
+      <button class="deny-btn" onclick="handleDecision('application2', 'denied')">Deny</button>
+    </div>
 </body>
 <script type="module" src="../../lib/applications/applicants.js"></script>
 </div>
+
 </html>

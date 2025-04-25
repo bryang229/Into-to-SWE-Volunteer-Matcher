@@ -6,12 +6,13 @@ const {
     registerVolunteer,
     getProfile,
     updateVolunteerData,
-    checkUsername
+    checkUsername,
+    getApplications
 } = require('../controllers/volunteerController');
-const { 
+const {
     verifySession,
     verifySessionIfAvailable
- } = require('../controllers/authController');
+} = require('../controllers/authController');
 
 //returns all volunteers (unsafe only for testing should be removed if ever published)
 //GET /api/volunteers/
@@ -25,11 +26,12 @@ router.post('/update', verifySession, updateVolunteerData);
 //GET /api/volunteers/check-username?username=username_to_lookup
 router.get('/check-username', checkUsername);
 //searches for that specific username
-//GET /api/volunteers/:username_to_lookup 
 // GET /api/volunteers/profile?uid=...
-router.get("/profile", getProfile);
-
+router.get("/profile", verifySessionIfAvailable, getProfile);
+//GET /api/volunteers/my-applications
+router.get("/my-applications", verifySession, getApplications);
 //moved to avoid bugs: it is greedy and takes over routes it's above!
+//GET /api/volunteers/:username_to_lookup 
 router.get('/:username', getVolunteerByUsername);
 
 
