@@ -1,5 +1,8 @@
 //Imports from firebase-config to authenticate session, reset user passwords, and sign them in
 import { auth, signInWithEmailAndPassword } from '../auth/firebase-config.js';
+import { setupNav } from '../common/nav_control.js';
+
+await setupNav('none');
 
 //Reset password handler (Untested)
 function resetPassword() {

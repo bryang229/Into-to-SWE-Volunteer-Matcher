@@ -130,6 +130,46 @@ const verifySession = async (req, res, next) => {
   }
 };
 
+
+
+
+//Checks if there's a cookie session active and let's the next know, with NO fail state if their not logged in
+const verifySessionIfAvailable = async (req, res, next) => {
+  const sessionCookie = req.cookies.session || '';
+
+  try {
+    const decodedClaims = await admin.auth().verifySessionCookie(sessionCookie, true);
+
+    // If accountType is missing, try to lookup and patch
+    if (!decodedClaims.accountType) {
+      const uid = decodedClaims.uid;
+
+      let accountType = null;
+
+      const volunteerDoc = await db.collection("Volunteers").doc(uid).get();
+      if (volunteerDoc.exists) {
+        accountType = "volunteer";
+      } else {
+        const companyDoc = await db.collection("companies").doc(uid).get();
+        if (companyDoc.exists) accountType = "company";
+      }
+
+      // Set custom claim so it's correct in future sessions
+      if (accountType) {
+        await admin.auth().setCustomUserClaims(uid, { accountType });
+        decodedClaims.accountType = accountType;
+      }
+    }
+
+    req.user = decodedClaims; // Now you have uid and accountType
+    console.log(req.user.accountType, "verify session end")
+    next();
+  } catch (err) {
+    console.log('No cookie session found');
+    req.user = null;
+    next();
+  }
+};
 // Returns user info for dashboard  
 const getPersonalProfile = async (req, res) => {
   const { uid, accountType } = req.user;
@@ -281,6 +321,7 @@ module.exports = {
   checkUsername,
   getUserInfo,
   verifySession,
+  verifySessionIfAvailable,
   getPersonalProfile,
   logout
 };

@@ -8,7 +8,10 @@ const {
     updateVolunteerData,
     checkUsername
 } = require('../controllers/volunteerController');
-const { verifySession } = require('../controllers/authController');
+const { 
+    verifySession,
+    verifySessionIfAvailable
+ } = require('../controllers/authController');
 
 //returns all volunteers (unsafe only for testing should be removed if ever published)
 //GET /api/volunteers/

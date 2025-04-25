@@ -36,7 +36,7 @@ export function renderPopUpListing(listing_data, accountType) {
       ? `<a href="/templates/volunteer/apply.html?listingId=${listing_data.id}"><button>Apply Now</button></a>`
       : accountType === "company"
         ? `<p>You must be a <strong>volunteer</strong> to apply.</p>`
-        : `<p>Please <a href="/templates/auth/login.html">log in</a> to apply.</p>`
+        : `<p>Please <a href="/templates/auth/login.html" style="color: #000000;"><strong>[log in]</strong></a> to apply.</p>`
     }
       <button onclick="this.parentElement.parentElement.remove()">Close</button>
     </div>

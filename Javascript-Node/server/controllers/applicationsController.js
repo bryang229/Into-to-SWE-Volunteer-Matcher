@@ -98,7 +98,7 @@ const editApplicationData = async (req, res) => {
 
 };
 //GET /api/applications/by-listing?listingId=...
-async function getApplicants(req, res)  {
+async function getApplicants(req, res) {
   const { listingId } = req.query;
   const snapshot = await db.collection("Applications")
     .where("listingId", "==", listingId)
@@ -108,9 +108,65 @@ async function getApplicants(req, res)  {
   res.status(200).json(results);
 };
 
+const requestAccess = async (req, res) => {
+  const { applicationId, field } = req.body;
+  const user = req.user;
+
+  if (!applicationId || !field) {
+    return res.status(400).json({ error: "Missing data." });
+  }
+
+  const appRef = db.collection("Applications").doc(applicationId);
+  await appRef.update({
+    accessRequests: admin.firestore.FieldValue.arrayUnion({
+      requestedBy: user.uid,
+      field,
+      requestedAt: new Date().toISOString()
+    })
+  });
+
+  res.status(200).json({ message: "Access request submitted." });
+};
+
+const updateStatus = async (req, res) => {
+  const { applicationId, newStatus } = req.body;
+  const user = req.user;
+
+  if (!applicationId || !newStatus) {
+    return res.status(400).json({ error: "Missing data" });
+  }
+
+  const docRef = db.collection("Applications").doc(applicationId);
+  const doc = await docRef.get();
+
+  if (!doc.exists) return res.status(404).json({ error: "Application not found" });
+
+  const data = doc.data();
+  const listingDoc = await db.collection("Listings").doc(data.listingId).get();
+  if (!listingDoc.exists) return res.status(404).json({ error: "Related listing not found" });
+
+  const listingData = listingDoc.data();
+  if (listingData.creatorUid !== user.uid) {
+    return res.status(403).json({ error: "Not authorized to modify this application" });
+  }
+
+  await docRef.update({
+    status: newStatus,
+    statusHistory: admin.firestore.FieldValue.arrayUnion({
+      updatedBy: user.uid,
+      newStatus,
+      updatedAt: new Date().toISOString()
+    })
+  });
+
+  res.status(200).json({ message: "Status updated" });
+};
+
 module.exports = {
   apply,
   getApplicationData,
   editApplicationData,
-  getApplicants
+  getApplicants,
+  requestAccess,
+  updateStatus
 }

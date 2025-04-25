@@ -1,3 +1,5 @@
+import { fetchUserData } from '../dashboard/dashboard_data.js';
+
 export async function loadCreateListings() {
   const logoutBtn = document.getElementById("logoutBtn");
   const loginLink = document.getElementById("loginLink");
@@ -107,32 +109,69 @@ export async function setupNav(accountType = null) {
   try {
     if (!accountType)
       accountType = (await verifyCookiesSession()).accountType;
-    const isCompany = accountType === 'company';
-    navLinks.innerHTML = `
+    if (!(accountType === "none")) {
+      const isCompany = accountType === 'company';
+      navLinks.innerHTML = `
     <a href="/templates/index.html">Home</a>  
     <a href="/templates/${accountType}/${accountType}_dashboard.html">Dashboard</a>
       ${isCompany ?
-        `<a href="/templates/company/applicants.html">Browse Applications</a>
+          `<div class="nav-dropdown">
+          <a href="#">Browse Applications ▾</a>
+          <div class="dropdown-submenu" id="applicationLinks"></div>
+        </div>
         <a href="/templates/company/create_listing.html">Create Listing</a>` :
-        //Browse listings could be like a search thing
-        `<a href="/templates/index.html">Browse Listings</a>        
+          //Browse listings could be like a search thing
+          `<a href="/templates/index.html">Browse Listings</a>        
          <a href="/templates/volunteer/application_portal.html">Check Applications</a>
         `
-      }
+        }
       <a href="/templates/index.html">Home</a>  
       <a href="/templates/common/account_settings.html">Account Settings</a>
       <a href="/templates/common/help.html">Help</a>
       <a href="#" id="logoutLink">Logout</a>
     `;
 
-    insertBackButton();
+      //Adding applicants pages as drop down dynamically
+      if (isCompany) {
+        try {
+          const user = await fetchUserData(); // get UID, companyName, etc.
+          const res = await fetch("/api/listings/");
+          const listings = await res.json();
 
-    document.getElementById("logoutLink").addEventListener("click", async (e) => {
-      e.preventDefault();
-      await fetch("/api/logout", { method: "POST" });
-      window.location.href = "/templates/auth/login.html";
-    });
-    console.log(accountType, "nav")
+          const myListings = listings.filter(l => l.creatorUid === user.uid);
+          const menu = document.getElementById("applicationLinks");
+
+          myListings.forEach(listing => {
+            menu.innerHTML += `
+            <a href="/templates/company/applicants.html?listingId=${listing.id}">
+              ${listing.title || "Untitled Listing"}
+            </a>
+          `;
+          });
+
+          if (myListings.length === 0) {
+            menu.innerHTML = `<span style="padding: 10px;">No listings yet</span>`;
+          }
+        } catch (err) {
+          console.warn("Error loading listings for nav:", err);
+        }
+      }
+      insertBackButton();
+
+      document.getElementById("logoutLink").addEventListener("click", async (e) => {
+        e.preventDefault();
+        await fetch("/api/logout", { method: "POST" });
+        window.location.href = "/templates/auth/login.html";
+      });
+      console.log(accountType, "nav")
+    } else {
+      navLinks.innerHTML = `
+    <a href="/templates/index.html">Home</a>  
+    <a href="/templates/auth/login.html">Log In</a>
+    <a href="/templates/auth/sign_up.html">Sign Up</a>
+    <a href="/templates/common/help.html">Help</a>
+  `;
+    }
     return accountType;
 
   } catch {

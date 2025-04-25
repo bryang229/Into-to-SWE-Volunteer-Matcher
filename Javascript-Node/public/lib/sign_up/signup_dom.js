@@ -1,5 +1,8 @@
 //Importing register handlers from handle_signup.js
 import { registerVolunteer, registerCompany } from './handle_signup.js';
+import { setupNav } from '../common/nav_control.js';
+
+await setupNav();
 
 //Debounce method allows for delayed checks (every 300ms) input is updated 
 //Debounce(func, delay) works as a wrapper method, delaying concurrent method calls by delay ms

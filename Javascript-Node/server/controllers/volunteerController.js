@@ -1,4 +1,4 @@
-const { db } = require('../firebase');
+const { db, admin } = require('../firebase');
 const cryptoJS = require("crypto-js");
 
 // POST /api/volunteers/register
@@ -64,11 +64,27 @@ const updateVolunteerData = async(req, res) => {
 // GET /api/volunteers/profile?uid=...
 async function getProfile (req, res) {
   const { uid } = req.query;
-  const doc = await db.collection("Volunteers").doc(uid).get();
+  const currentUser = req.user || null;
 
+  const doc = await db.collection("Volunteers").doc(uid).get();
   if (!doc.exists) return res.status(404).json({ error: "User not found" });
-  res.status(200).json({ id: doc.id, ...doc.data() });
-}
+
+  const data = doc.data();
+  const privacyFields = data.privacyFields || [];
+
+  const isSelf = currentUser?.uid === uid;
+  const result = { id: doc.id, username: data.username };
+
+  for (const [key, value] of Object.entries(data)) {
+    if (isSelf || !privacyFields.includes(key)) {
+      result[key] = value;
+    } else {
+      result[key] = "[Private]";
+    }
+  }
+
+  res.status(200).json(result);
+};
 
 
 // GET /api/volunteers -> returns all volunteers, should be removed when not testing (production)

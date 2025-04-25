@@ -1,4 +1,4 @@
-const { db } = require('../firebase');
+const { db, admin } = require('../firebase');
 const cryptoJS = require("crypto-js");
 
 const registerCompany = async (req, res) => {
