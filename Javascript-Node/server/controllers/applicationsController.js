@@ -97,9 +97,20 @@ const editApplicationData = async (req, res) => {
   res.status(200).json({ message: "Application updated successfully" });
 
 };
+//GET /api/applications/by-listing?listingId=...
+async function getApplicants(req, res)  {
+  const { listingId } = req.query;
+  const snapshot = await db.collection("Applications")
+    .where("listingId", "==", listingId)
+    .get();
+
+  const results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  res.status(200).json(results);
+};
 
 module.exports = {
   apply,
   getApplicationData,
-  editApplicationData
+  editApplicationData,
+  getApplicants
 }

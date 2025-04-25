@@ -1,6 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { getVolunteers, getVolunteerByUsername, registerVolunteer, updateVolunteerData, checkUsername } = require('../controllers/volunteerController');
+const {
+    getVolunteers,
+    getVolunteerByUsername,
+    registerVolunteer,
+    getProfile,
+    updateVolunteerData,
+    checkUsername
+} = require('../controllers/volunteerController');
 const { verifySession } = require('../controllers/authController');
 
 //returns all volunteers (unsafe only for testing should be removed if ever published)
@@ -16,7 +23,12 @@ router.post('/update', verifySession, updateVolunteerData);
 router.get('/check-username', checkUsername);
 //searches for that specific username
 //GET /api/volunteers/:username_to_lookup 
+// GET /api/volunteers/profile?uid=...
+router.get("/profile", getProfile);
+
 //moved to avoid bugs: it is greedy and takes over routes it's above!
 router.get('/:username', getVolunteerByUsername);
+
+
 
 module.exports = router;

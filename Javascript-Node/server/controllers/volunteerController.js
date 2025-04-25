@@ -61,6 +61,15 @@ const updateVolunteerData = async(req, res) => {
 }
 
 
+// GET /api/volunteers/profile?uid=...
+async function getProfile (req, res) {
+  const { uid } = req.query;
+  const doc = await db.collection("Volunteers").doc(uid).get();
+
+  if (!doc.exists) return res.status(404).json({ error: "User not found" });
+  res.status(200).json({ id: doc.id, ...doc.data() });
+}
+
 
 // GET /api/volunteers -> returns all volunteers, should be removed when not testing (production)
 const getVolunteers = async (req, res) => {
@@ -110,6 +119,7 @@ const checkUsername = async (req, res) => {
 module.exports = {
   registerVolunteer,
   updateVolunteerData,
+  getProfile,
   getVolunteers,
   getVolunteerByUsername,
   checkUsername

@@ -20,11 +20,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupNav(cachedUserData.accountType);
 
     if (cachedUserData.accountType === "volunteer") {
-      window.location.href = "/templates/volunter/volunteer_dashboard.html";
+      window.location.href = "/templates/volunteer/volunteer_dashboard.html";
       return;
     }
 
     populateFields(cachedUserData);
+    await loadCompanyListings(cachedUserData.uid);
+
   } catch (err) {
     console.error(err);
     setTimeout(() => {
@@ -126,4 +128,45 @@ function populateFields(user) {
   // Store originals
   originalValues["companyBio"] = user.companyBio || '';
   originalValues["publicEmail"] = user.publicEmail || '';
+}
+
+// Loads company's listing
+async function loadCompanyListings(companyUid) {
+  const list = document.getElementById("listingList");
+  list.innerHTML = "";
+
+  try {
+    const res = await fetch("/api/listings/");
+    const listings = await res.json();
+
+    const companyListings = listings.filter(l => l.creatorUid === companyUid);
+
+    if (companyListings.length === 0) {
+      list.innerHTML = "<li>You haven't posted any listings yet.</li>";
+      return;
+    }
+
+    companyListings.forEach(listing => {
+      const li = document.createElement("li");
+      li.className = "listing-entry";
+      li.innerHTML = `
+        <h4>${listing.title}</h4>
+        <p><strong>Date:</strong> ${listing.date}</p>
+        <p><strong>Location:</strong> ${listing.location}</p>
+        <p>${listing.description}</p>
+        <button class="view-applicants-btn" data-id="${listing.id}">View Applicants</button>
+      `;
+      list.appendChild(li);
+    });
+
+    document.querySelectorAll(".view-applicants-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const listingId = btn.dataset.id;
+        window.location.href = `/templates/company/applicants.html?listingId=${listingId}`;
+      });
+    });
+  } catch (err) {
+    console.error("Failed to load listings:", err);
+    list.innerHTML = "<li>Error loading listings.</li>";
+  }
 }
