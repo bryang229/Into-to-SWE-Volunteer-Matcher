@@ -1,12 +1,12 @@
-import { verifyCookiesSession } from "../auth/cookies.js";
+import { fetchUserData } from "../dashboard/dashboard_data.js";
 import { setupNav } from "../common/nav_control.js"
 
 document.addEventListener("DOMContentLoaded", async () => {
 
     const params = new URLSearchParams(window.location.search);
 
-    const session = await verifyCookiesSession();
-    const accountType = session?.accountType;
+    const user = await fetchUserData();
+    const accountType = user?.accountType;
     console.log("Verified session, account type:", accountType);
 
     await setupNav(accountType); // pass to setupNav for rendering navLinks
@@ -17,10 +17,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         }, 10000);
         return;
     }
-
-
     const listingId = params.get("listingId");
+    
+    //Front check if already applied
+    const alreadyApplied = user.applications?.some(app => app.listingId === listingId);
 
+    if (alreadyApplied) {
+        alert("You’ve already applied to this listing.");
+        setTimeout(() => {
+            window.location.href = "/templates/volunteer/volunteer_dashboard.html";
+        }, 100);
+        return;
+    }
 
     if (!listingId) {
         alert("No listing ID provided");
@@ -53,7 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
 
     //Render title fully
-    document.querySelector(".nav-title").innerText +=  ` ${listing.title}: ${listing.companyName}`;
+    document.querySelector(".nav-title").innerText += ` ${listing.title}: ${listing.companyName}`;
 
     // Render question inputs
     const questionsContainer = document.getElementById("questions-container");
@@ -96,7 +104,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             },
             body: JSON.stringify({
                 listingId,
-                answers
+                answers: answers
             })
         });
 

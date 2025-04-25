@@ -23,6 +23,7 @@ const registerVolunteer = async (req, res) => {
       fullname,
       hashedEmail,
       username_lowercase,
+      applications: [],
       createdAt: new Date()
     };
     // Send to database

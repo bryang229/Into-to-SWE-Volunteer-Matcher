@@ -4,7 +4,7 @@ const { apply } = require('../controllers/applicationsController');
 const { verifySession } = require("../controllers/authController")
 //Returns all listings
 // GET /applications/apply
-router.post("/applications/apply", verifySession, apply);
+router.post("/apply", verifySession, apply);
 
 
 
