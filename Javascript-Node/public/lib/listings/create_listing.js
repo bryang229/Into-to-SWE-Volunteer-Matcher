@@ -1,46 +1,12 @@
-console.log('Script loaded, setting up logout listener');
-
-const logoutBtn = document.getElementById("logout-btn");
-if (!logoutBtn) {
-    console.error('Logout button not found!');
-} else {
-    console.log('Logout button found, adding listener');
-    logoutBtn.addEventListener("click", async () => {
-        console.log('Logout clicked');
-        try {
-            const res = await fetch('/api/logout', {  // Changed from '/api/auth/logout'
-                method: 'POST',
-                credentials: 'include'
-            });
-            console.log('Logout response:', res);
-            if (res.ok) {
-                document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                window.location.href = '/templates/auth/login.html';
-            } else {
-                alert('Logout failed: ' + res.statusText);
-            }
-        } catch (err) {
-            console.error('Logout failed:', err);
-            alert('Logout failed: ' + err.message);
-        }
-    });
-}
+import { setupNav } from "../common/nav_control.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     const form = document.getElementById("listingForm");
     const companyField = document.getElementById("company");
 
-    // Auth check with retries
-    async function checkAuth(retries = 2) {
-        while (retries >= 0) {
+    const getUserData = async (retries = 2) => {
+        while (retries-- >= 0) {
             try {
-                // Debug cookie information
-                const allCookies = document.cookie;
-                console.log('Cookie debug:', {
-                    raw: allCookies,
-                    parsed: document.cookie.split(';').map(c => c.trim())
-                });
-
                 const res = await fetch("/api/me", {
                     method: 'GET',
                     credentials: "include",
@@ -49,123 +15,61 @@ document.addEventListener("DOMContentLoaded", async () => {
                         "Content-Type": "application/json"
                     }
                 });
+                const text = await res.text();
+                const data = JSON.parse(text);
 
-                const responseText = await res.text();
-                console.log('Raw server response:', responseText);
+                if (!data?.accountType) throw new Error("Invalid or missing accountType");
 
-                let data;
-                try {
-                    data = JSON.parse(responseText);
-                    console.log('Parsed data:', data);
-
-                    // Check the actual structure we're getting
-                    console.log('Data check:', {
-                        data: data,
-                        type: typeof data,
-                        hasRole: 'accountType' in data,
-                        accountType: data?.accountType,
-                        keys: Object.keys(data)
-                    });
-
-                    if (!data) {
-                        throw new Error('Empty data from server');
-                    }
-
-                    // Check if accountType exists before accessing
-                    if (!('accountType' in data)) {
-                        console.error('Missing accountType in data:', data);
-                        throw new Error('No accountType found in user data');
-                    }
-
-                    return data;
-                } catch (e) {
-                    console.error('Data processing error:', e);
-                    throw e;
-                }
+                return data;
             } catch (err) {
-                console.error('Auth check error details:', {
-                    attempt: 2 - retries,
-                    error: err.message,
-                    stack: err.stack
-                });
-
-                if (retries <= 0) {
-                    console.warn("Session validation failed; will redirect but not delete cookie yet.");
-                    throw err;
-                }
-                retries--;
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                console.warn(`Auth check failed (retries left: ${retries})`, err.message);
+                if (retries < 0) throw err;
+                await new Promise(r => setTimeout(r, 1000));
             }
         }
-    }
+    };
+
+    const routeUser = (user) => {
+        const role = user.accountType?.toLowerCase()?.trim();
+        if (role === 'volunteer') {
+            window.location.replace("/templates/index.html");
+        } else if (role === 'company') {
+            const name = user.companyName || user.company_name || "Unknown Company";
+            companyField.value = name;
+        } else {
+            window.location.replace("/templates/index.html");
+        }
+    };
 
     try {
-        const userData = await checkAuth();
-        console.log('Final user data for redirect decision:', {
-            accountType: userData.accountType,
-            normalizedRole: userData.accountType?.toLowerCase?.(),
-            isVolunteer: userData.accountType === 'volunteer',
-            isCompany: userData.accountType === 'company'
-        });
-
-        // Update accountType checks to be more explicit
-        const userRole = (userData.accountType || '').toLowerCase().trim();
-
-        if (userRole === 'volunteer') {
-            console.log('Volunteer detected - redirecting to home page');
-            window.location.replace("/templates/index.html");
-            return;
-        }
-
-        if (userRole === 'company') {
-            console.log('Company detected - staying on page');
-            
-            // Debug: Log the entire userData object
-            console.log('Full user data:', JSON.stringify(userData, null, 2));
-            
-            // Debug: Check if company field exists
-            console.log('Company field element:', companyField);
-            console.log('Company field properties:', {
-                id: companyField.id,
-                value: companyField.value,
-                readOnly: companyField.readOnly
-            });
-            
-            // Set and verify company name
-            const companyName = userData.autofilledCompany || 
-                              userData.companyName || 
-                              userData.company_name ||
-                              userData.name ||  // Try 'name' field too
-                              'Unknown Company';
-                              
-            companyField.value = companyName;
-            
-            // Debug: Verify the value was set
-            console.log('Attempted to set company name to:', companyName);
-            console.log('Company field value after setting:', companyField.value);
-        } else {
-            console.log('Unknown accountType detected - redirecting to index');
-            window.location.replace("/templates/index.html");
-            return;
-        }
-
-    } catch (err) {
-        console.error("Auth error:", err.message);
-        window.location.replace("/templates/login.html");
-        return;
+        const user = await getUserData();
+        routeUser(user);
+        setupNav(user.accountType)
+    } catch {
+        window.location.replace("/templates/auth/login.html");
     }
+
 
     // Form submit logic
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
+        const questions = [];
+        if (toggle.checked) {
+            questionList.querySelectorAll("input").forEach(input => {
+                const q = input.value.trim();
+                if (q) questions.push(q);
+            });
+        }
+
         const listing = {
             title: document.getElementById("title").value.trim(),
             location: document.getElementById("location").value.trim(),
             date: document.getElementById("date").value,
-            company: companyField.value.trim(),
+            companyName: companyField.value.trim(),
             tags: document.getElementById("tags").value.split(",").map(tag => tag.trim()),
-            description: document.getElementById("description").value.trim()
+            description: document.getElementById("description").value.trim(),
+            questions: questions.length > 0 ? questions : undefined,
         };
 
         try {
@@ -188,4 +92,33 @@ document.addEventListener("DOMContentLoaded", async () => {
             alert("Network or server error. Check console.");
         }
     });
+
+});
+// Adding additional fields/toggling fields
+const toggle = document.getElementById("includeQuestionsToggle");
+const questionSection = document.getElementById("questionSection");
+const questionList = document.getElementById("questionList");
+const addQuestionBtn = document.getElementById("addQuestionBtn");
+
+toggle.addEventListener("change", () => {
+    questionSection.style.display = toggle.checked ? "block" : "none";
+});
+
+addQuestionBtn.addEventListener("click", () => {
+    const div = document.createElement("div");
+    div.className = "question-card";
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "Enter your question";
+
+    const removeBtn = document.createElement("button");
+    removeBtn.innerText = "X";
+    removeBtn.className = "remove-question";
+    removeBtn.addEventListener("click", () => div.remove());
+
+    div.appendChild(input);
+    div.appendChild(removeBtn);
+
+    questionList.appendChild(div);
 });

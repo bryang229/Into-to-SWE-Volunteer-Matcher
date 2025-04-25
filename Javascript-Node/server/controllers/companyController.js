@@ -20,6 +20,7 @@ const registerCompany = async (req, res) => {
       publicEmail,
       companyBio,
       hashedEmail,
+      listings: [],
       username_lowercase,
       createdAt: new Date()
     };

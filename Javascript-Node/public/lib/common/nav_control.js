@@ -95,7 +95,7 @@ import { verifyCookiesSession } from '../auth/cookies.js';
 export async function setupNav(accountType = null) {
   const navLinks = document.getElementById("navLinks");
   if (!navLinks) return;
-
+  console.log("starting")
   try {
     if(!accountType)
       accountType = (await verifyCookiesSession()).accountType;
@@ -103,7 +103,8 @@ export async function setupNav(accountType = null) {
     navLinks.innerHTML = `
       <a href="/templates/${accountType}/${accountType}_dashboard.html">Dashboard</a>
       ${isCompany ? 
-        '<a href="/templates/company/applicants.html">Browse Applications</a>':
+        `<a href="/templates/company/applicants.html">Browse Applications</a>
+        <a href="/templates/company/create_listing.html">Create Listing</a>` :
         //Browse listings could be like a search thing
         `<a href="/templates/index.html">Browse Listings</a>        
          <a href="/templates/volunteer/application_portal.html">Check Applications</a>
@@ -119,11 +120,15 @@ export async function setupNav(accountType = null) {
       await fetch("/api/logout", { method: "POST" });
       window.location.href = "/templates/auth/login.html";
     });
+    console.log(accountType, "nav")
+    return accountType;
+
   } catch {
     navLinks.innerHTML = `
       <a href="/templates/auth/login.html">Log In</a>
       <a href="/templates/auth/sign_up.html">Sign Up</a>
       <a href="/templates/common/help.html">Help</a>
     `;
+    return null;
   }
 }
