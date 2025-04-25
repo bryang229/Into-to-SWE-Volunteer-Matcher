@@ -1,6 +1,6 @@
 const { db, admin } = require('../firebase');
 
-async function apply (req, res) {
+async function apply(req, res) {
   const { listingId, answers } = req.body;
   const user = req.user;
 
@@ -32,7 +32,7 @@ async function apply (req, res) {
   });
 
   // Update volunteer profile
-  await db.collection("volunteers").doc(user.uid).set({
+  await db.collection("Volunteers").doc(user.uid).set({
     applications: admin.firestore.FieldValue.arrayUnion({
       listingId,
       applicationId: newAppRef.id
@@ -42,6 +42,64 @@ async function apply (req, res) {
   res.status(201).json({ message: "Application submitted", id: newAppRef.id });
 };
 
+const getApplicationData = async (req, res) => {
+  try {
+    const { applicationId } = req.query;
+    // console.log("Requested listing ID:", listingId);
+    const snapshot = await db.collection('Applications').doc(applicationId).get();
+
+    if (!snapshot.exists) {
+      return res.status(404).json({ error: "Application not found" });
+    }
+
+    return res.status(200).json({ id: snapshot.id, ...snapshot.data() });
+
+  } catch (err) {
+    console.error("Error fetching listing:", err.message);
+    return res.status(500).json({ error: err.message });
+  }
+};
+
+const editApplicationData = async (req, res) => {
+  const { applicationId } = req.query;
+  const { answers, edited } = req.body;
+  const user = req.user;
+
+  if (!applicationId || !answers) {
+    return res.status(400).json({ error: "Missing required fields." });
+  }
+
+  const docRef = db.collection("Applications").doc(applicationId);
+  const snapshot = await docRef.get();
+
+  if (!snapshot.exists) {
+    return res.status(404).json({ error: "Application not found" });
+  }
+
+  const app = snapshot.data();
+  if (app.applicantUid !== user.uid) {
+    return res.status(403).json({ error: "Unauthorized access" });
+  }
+
+  if (app.status !== "Waiting for Review") {
+    return res.status(400).json({ error: "Cannot edit this application anymore." });
+  }
+
+  const editDate = new Date().toISOString();
+
+  await docRef.update({
+    answers,
+    edited: edited === true,
+    updatedAt: editDate,
+    editHistory: admin.firestore.FieldValue.arrayUnion(editDate)
+  });
+
+  res.status(200).json({ message: "Application updated successfully" });
+
+};
+
 module.exports = {
-    apply
+  apply,
+  getApplicationData,
+  editApplicationData
 }

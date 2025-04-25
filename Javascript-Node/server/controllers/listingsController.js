@@ -17,7 +17,7 @@ const getListings = async (req, res) => {
 
 const getListingData = async (req, res) => {
   try {
-    const { listingId } = req.body;
+    const { listingId } = req.query;
     // console.log("Requested listing ID:", listingId);
     const snapshot = await db.collection('Listings').doc(listingId).get();
 

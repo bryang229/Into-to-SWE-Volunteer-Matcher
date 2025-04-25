@@ -34,16 +34,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         alert("No listing ID provided");
         return;
     }
-    const listingRes = await fetch(`/api/listings/listing-data?listingId=${listingId}`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            listingId
-        })
-    });
+    const listingRes = await fetch(`/api/listings/listing-data?listingId=${listingId}`);
     if (!listingRes.ok) {
         alert("Listing not found");
         return;

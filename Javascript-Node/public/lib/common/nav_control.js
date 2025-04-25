@@ -101,7 +101,8 @@ export async function setupNav(accountType = null) {
       accountType = (await verifyCookiesSession()).accountType;
     const isCompany = accountType === 'company';
     navLinks.innerHTML = `
-      <a href="/templates/${accountType}/${accountType}_dashboard.html">Dashboard</a>
+    <a href="/templates/index.html">Home</a>  
+    <a href="/templates/${accountType}/${accountType}_dashboard.html">Dashboard</a>
       ${isCompany ? 
         `<a href="/templates/company/applicants.html">Browse Applications</a>
         <a href="/templates/company/create_listing.html">Create Listing</a>` :
@@ -110,6 +111,7 @@ export async function setupNav(accountType = null) {
          <a href="/templates/volunteer/application_portal.html">Check Applications</a>
         `
       }
+      <a href="/templates/index.html">Home</a>  
       <a href="/templates/common/account_settings.html">Account Settings</a>
       <a href="/templates/common/help.html">Help</a>
       <a href="#" id="logoutLink">Logout</a>
@@ -125,6 +127,7 @@ export async function setupNav(accountType = null) {
 
   } catch {
     navLinks.innerHTML = `
+      <a href="/templates/index.html">Home</a>  
       <a href="/templates/auth/login.html">Log In</a>
       <a href="/templates/auth/sign_up.html">Sign Up</a>
       <a href="/templates/common/help.html">Help</a>

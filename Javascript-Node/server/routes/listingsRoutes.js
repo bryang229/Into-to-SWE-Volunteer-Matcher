@@ -10,7 +10,7 @@ router.get('/', getListings);
 router.post('/create-listing',verifySession, createListing);
 
 // POST /api/listings/listing-data (gets listing data from DB)
-router.post('/listing-data',getListingData);
+router.get('/listing-data',getListingData);
 
 
 module.exports = router;
