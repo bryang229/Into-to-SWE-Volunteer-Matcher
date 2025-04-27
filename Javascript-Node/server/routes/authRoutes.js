@@ -5,6 +5,7 @@ const { sessionLogin,
         verifySession,
         getUserInfo,
         getPersonalProfile,
+        searchUsers,
         logout
     } = require('../controllers/authController');
 
@@ -21,7 +22,8 @@ router.get('/sessionVerify', verifySession, (req, res) => {
   });
 // GET /api/auth/me
 router.get('/me', verifySession, getPersonalProfile);
-
+// GET /api/auth/search?query=...
+router.get('/search', verifySession, searchUsers);
 //GET /api/logout
 router.post('/logout', logout);
 

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Messages</title>
+    <link rel="stylesheet" href="../../static/pages/messaging.css" />
+    <link rel="stylesheet" href="../../static/base.css" />
+</head>
+
+<body>
+    <nav>
+        <div class="nav-title"><a href="/templates/index.html">Volunteer Matcher</a></div>
+        <div class="dropdown">
+            <button class="dropbtn">Menu ▾</button>
+            <div class="dropdown-content" id="navLinks">
+                <!-- JS will populate -->
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="new-chat-button">
+            <button id="newChatBtn">+ New Chat</button>
+        </div>
+        <div class="chat-list" id="chatList">
+            <!-- Populated by messaging.js -->
+        </div>
+    </div>
+
+    <script type="module" src="../../lib/messaging/messages.js"></script>
+</body>
+
+</html>

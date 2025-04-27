@@ -1,0 +1,178 @@
+/* Reset and base styles */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+}
+
+/* Shared container (chat list or chat view) */
+.container,
+.chat-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #fff;
+}
+
+/* New chat button */
+.new-chat-button {
+    padding: 0.5rem;
+    text-align: center;
+}
+
+.new-chat-button button {
+    background-color: #1e90ff;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.new-chat-button button:hover {
+    background-color: #187bcd;
+}
+
+/* Chat list styles */
+.chat-list {
+    flex: 1;
+    overflow-y: auto;
+    border-right: 1px solid #ddd;
+    padding: 0.5rem;
+}
+
+.chat-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.chat-item:hover {
+    background-color: #f0f0f0;
+}
+
+.chat-item .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    background-color: #ccc;
+    background-size: cover;
+}
+
+.chat-item .info {
+    flex: 1;
+}
+
+.chat-item .info .name {
+    font-weight: bold;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.chat-item .info .snippet {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.chat-item .time {
+    font-size: 0.75rem;
+    color: #999;
+    margin-left: auto;
+}
+
+/* Chat view header */
+.chat-header {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    background-color: #fafafa;
+    border-bottom: 1px solid #ddd;
+}
+
+.chat-header .back-btn {
+    margin-right: 0.75rem;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.chat-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+/* Chat messages area with bottom margin to accommodate sticky input /
+    .chat-messages {
+    flex: 1;
+    padding: 0.75rem;
+    overflow-y: auto;
+    background-color: #fff;
+    margin-bottom: 3.5rem; / ensure space for input */
+}
+
+/* Chat input area - sticky at bottom */
+.chat-input {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    padding: 0.5rem;
+    border-top: 1px solid #ddd;
+    background-color: #fafafa;
+    z-index: 10;
+}
+
+.chat-input textarea {
+    flex: 1;
+    resize: none;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+.chat-input button {
+    margin-left: 0.5rem;
+    background-color: #1e90ff;
+    color: #fff;
+    border: none;
+    padding: 0 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.chat-input button:hover {
+    background-color: #187bcd;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+
+    .container,
+    .chat-container {
+        max-width: 100%;
+        height: 100%;
+    }
+
+    .chat-item .avatar {
+        width: 28px;
+        height: 28px;
+    }
+
+    .chat-header h2 {
+        font-size: 1rem;
+    }
+}

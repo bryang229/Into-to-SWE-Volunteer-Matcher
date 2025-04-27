@@ -1,6 +1,5 @@
 const { db, admin } = require('../firebase');
 const cryptoJS = require("crypto-js");
-const { get } = require('../routes/companyRoutes');
 
 const registerCompany = async (req, res) => {
   const { uid, username, companyName, publicEmail, privateEmail, companyBio, admin_fullname } = req.body;
@@ -64,7 +63,7 @@ const updateCompanyData = async(req, res) => {
 
 const getListings = async (req, res) => {
   const user = req.user;
-
+console.log('called')
   if (!user || !user.uid) {
     return res.status(401).json({ error: "Unauthorized" });
   }

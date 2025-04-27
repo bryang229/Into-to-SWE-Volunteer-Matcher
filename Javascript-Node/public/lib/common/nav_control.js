@@ -1,6 +1,7 @@
 import { verifyCookiesSession } from '../auth/cookies.js';
 
 export async function setupNav(accountType = null) {
+  insertBackButton();
 
   // Save current page as "previousPage" before moving forward
   const currentPath = window.location.pathname + window.location.search;
@@ -36,6 +37,7 @@ export async function setupNav(accountType = null) {
          </div>
         `
         }
+      <a href="/templates/common/messages.html">Check your messages</a>
       <a href="/templates/common/account_settings.html">Account Settings</a>
       <a href="/templates/common/help.html">Help</a>
       <a href="#" id="logoutLink">Logout</a>
@@ -44,7 +46,7 @@ export async function setupNav(accountType = null) {
       //Adding applicants pages as drop down dynamically
       if (isCompany) {
         try {
-          const res = await fetch("/api/company/my-listings", { credentials: "include" });
+          const res = await fetch("/api/companies/my-listings", { credentials: "include" });
           const myListings = await res.json();
 
           const menu = document.getElementById("applicationLinks");
@@ -54,7 +56,7 @@ export async function setupNav(accountType = null) {
           } else {
             myListings.forEach(listing => {
               menu.innerHTML += `
-                <a href="/templates/company/applicants.html?listingId=${listing.id}">
+                <a href="/templates/companies/applicants.html?listingId=${listing.id}">
                   ${listing.title || "Untitled Listing"}
                 </a>
               `;
@@ -89,7 +91,6 @@ export async function setupNav(accountType = null) {
           console.error("Failed to load volunteer pending applications:", err);
         }
       }
-      insertBackButton();
 
       document.getElementById("logoutLink").addEventListener("click", async (e) => {
         e.preventDefault();

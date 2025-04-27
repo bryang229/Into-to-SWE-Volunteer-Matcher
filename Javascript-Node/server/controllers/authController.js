@@ -209,6 +209,55 @@ const getPersonalProfile = async (req, res) => {
   });
 };
 
+async function searchUsers(req, res) {
+  const q = (req.query.query || '').trim().toLowerCase();
+  if (!q) {
+    return res.json([]); // no query, return empty
+  }
+  console.log(q)
+  try {
+    // 1️ Search volunteers by username_lowercase
+    const volSnap = await db.collection('Volunteers')
+      .where('username_lowercase', '>=', q)
+      .where('username_lowercase', '<=', q + '\uf8ff')
+      .limit(10)
+      .get();
+
+    const volunteers = volSnap.docs.map(doc => {
+      const d = doc.data();
+      return {
+        uid: doc.id,
+        name: d.fullname || d.username,
+        avatarUrl: d.avatarUrl || '',
+        type: 'volunteer'
+      };
+    });
+
+    // 2️ Search companies by companyName_lowercase
+    const compSnap = await db.collection('companies')
+      .where('username_lowercase', '>=', q)
+      .where('username_lowercase', '<=', q + '\uf8ff')
+      .limit(10)
+      .get();
+
+    const companies = compSnap.docs.map(doc => {
+      const d = doc.data();
+      return {
+        uid: doc.id,
+        name: d.companyName || d.name,
+        avatarUrl: d.avatarUrl || '',
+        type: 'company'
+      };
+    });
+
+    // 3️ Merge & return
+    res.json([...volunteers, ...companies]);
+  } catch (err) {
+    console.error("User search failed:", err);
+    res.status(500).json({ error: 'Search failed' });
+  }
+}
+
 const logout = async (req, res) => {
   try {
     const sessionCookie = req.cookies.session || '';
@@ -329,6 +378,7 @@ module.exports = {
   sessionLogin,
   checkUsername,
   getUserInfo,
+  searchUsers,
   verifySession,
   verifySessionIfAvailable,
   getPersonalProfile,
