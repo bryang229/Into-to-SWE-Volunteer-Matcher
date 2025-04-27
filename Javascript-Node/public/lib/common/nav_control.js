@@ -67,7 +67,7 @@ export async function setupNav(accountType = null) {
           } else {
             myListings.forEach(listing => {
               menu.innerHTML += `
-                <a href="/templates/companies/applicants.html?listingId=${listing.id}">
+                <a href="/templates/company/applicants.html?listingId=${listing.id}">
                   ${listing.title || "Untitled Listing"}
                 </a>
               `;
