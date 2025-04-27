@@ -79,7 +79,7 @@ export async function setupNav(accountType = null) {
           } else {
             pendingApps.forEach(app => {
               menu.innerHTML += `
-                <a href="/templates/volunteer/volunteer_application_review.html?applicationId=${app.id}">
+                <a href="/templates/volunteer/application_review.html?applicationId=${app.id}">
                   ${app.listingTitle || "Unknown Listing"}
                 </a>
               `;
