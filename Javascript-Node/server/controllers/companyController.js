@@ -1,6 +1,5 @@
 const { db, admin } = require('../firebase');
 const cryptoJS = require("crypto-js");
-const { get } = require('../routes/companyRoutes');
 
 const registerCompany = async (req, res) => {
   const { uid, username, companyName, publicEmail, privateEmail, companyBio, admin_fullname } = req.body;
