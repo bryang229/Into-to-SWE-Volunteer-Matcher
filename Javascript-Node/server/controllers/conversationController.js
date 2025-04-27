@@ -11,13 +11,8 @@ async function getConversations(req, res) {
       .get();
 
     const convos = await Promise.all(snap.docs.map(async doc => {
-      const data = doc.data();
+      const convo = doc.data();
       const partner = convo.participants.find(p => p.uid !== uid);
-      res.json({
-        partnerName,
-        partnerUid: partner.uid,
-        messages
-      });
 
       const col = partner.type === 'company' ? 'companies' : 'Volunteers';
       const userSnap = await db.collection(col).doc(partner.uid).get();
@@ -27,12 +22,13 @@ async function getConversations(req, res) {
         id: doc.id,
         partnerName: userData.fullname || userData.companyName || 'Unknown',
         avatarUrl: userData.avatarUrl || '',
-        lastMessageSnippet: data.lastMessage?.slice(0, 30) || '',
-        lastMessageAt: data.lastMessageAt
+        lastMessageSnippet: convo.lastMessage?.slice(0, 30) || '',
+        lastMessageAt: convo.lastMessageAt
       };
     }));
 
     res.json(convos);
+
   } catch (err) {
     console.error('getConversations error:', err);
     res.status(500).json({ error: 'Failed to fetch conversations' });

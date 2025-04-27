@@ -1,4 +1,6 @@
 import { verifyCookiesSession } from '../auth/cookies.js';
+import { monitorConnection } from '../common/connectionMonitor.js';
+
 
 export async function setupNav(accountType = null) {
   insertBackButton();
@@ -8,6 +10,14 @@ export async function setupNav(accountType = null) {
   const lastPage = sessionStorage.getItem("currentPage");
   sessionStorage.setItem("previousPage", lastPage);
   sessionStorage.setItem("currentPage", currentPath);
+
+  const navTitle = document.querySelector('.nav-title');
+  if (navTitle && !document.getElementById('globalConnectionDot')) {
+    const connectionDot = document.createElement('span');
+    connectionDot.id = 'globalConnectionDot';
+    connectionDot.className = 'connection-dot';
+    navTitle.appendChild(connectionDot);
+  }
 
   const navLinks = document.getElementById("navLinks");
   if (!navLinks) return;
@@ -106,6 +116,7 @@ export async function setupNav(accountType = null) {
     <a href="/templates/common/help.html">Help</a>
   `;
     }
+    await monitorConnection({ dotId: 'globalConnectionDot' });
     return accountType;
 
   } catch {
