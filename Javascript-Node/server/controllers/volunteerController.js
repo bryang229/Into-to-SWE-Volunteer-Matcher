@@ -1,4 +1,4 @@
-const { db } = require('../firebase');
+const { db, admin } = require('../firebase');
 const cryptoJS = require("crypto-js");
 
 // POST /api/volunteers/register
@@ -23,6 +23,7 @@ const registerVolunteer = async (req, res) => {
       fullname,
       hashedEmail,
       username_lowercase,
+      applications: [],
       createdAt: new Date()
     };
     // Send to database
@@ -59,6 +60,31 @@ const updateVolunteerData = async(req, res) => {
   }
 }
 
+
+// GET /api/volunteers/profile?uid=...
+async function getProfile (req, res) {
+  const { uid } = req.query;
+  const currentUser = req.user || null;
+
+  const doc = await db.collection("Volunteers").doc(uid).get();
+  if (!doc.exists) return res.status(404).json({ error: "User not found" });
+
+  const data = doc.data();
+  const privacyFields = data.privacyFields || [];
+
+  const isSelf = currentUser?.uid === uid;
+  const result = { id: doc.id, username: data.username };
+
+  for (const [key, value] of Object.entries(data)) {
+    if (isSelf || !privacyFields.includes(key)) {
+      result[key] = value;
+    } else {
+      result[key] = "[Private]";
+    }
+  }
+
+  res.status(200).json(result);
+};
 
 
 // GET /api/volunteers -> returns all volunteers, should be removed when not testing (production)
@@ -104,12 +130,46 @@ const checkUsername = async (req, res) => {
   }
 };
 
+// gets volunteers applied application data
+const getApplications = async (req, res) => {
+  const user = req.user;
+
+  if (!user || !user.uid) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  const volunteerDoc = await db.collection("Volunteers").doc(user.uid).get();
+  if (!volunteerDoc.exists) {
+    return res.status(404).json({ error: "Volunteer profile not found" });
+  }
+
+  const data = volunteerDoc.data();
+  const appsArray = data.applications || [];
+
+  if (appsArray.length === 0) {
+    return res.status(200).json([]);
+  }
+
+  // Fetch all corresponding Applications
+  const promises = appsArray.map(app => 
+    db.collection("Applications").doc(app.applicationId).get()
+  );
+  const appSnapshots = await Promise.all(promises);
+
+  const applications = appSnapshots
+    .filter(doc => doc.exists)
+    .map(doc => ({ id: doc.id, ...doc.data() }));
+
+  res.status(200).json(applications);
+};
 
 //Export functions so they can be used in routers to link the function to the route!
 module.exports = {
   registerVolunteer,
   updateVolunteerData,
+  getProfile,
   getVolunteers,
   getVolunteerByUsername,
-  checkUsername
+  checkUsername,
+  getApplications
 };

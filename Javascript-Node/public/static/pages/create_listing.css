@@ -45,3 +45,34 @@ button {
 .nav-bar button {
     background-color: #dc3545;
 }
+
+/* Add listing styling */
+#questionSection {
+    margin-top: 1em;
+    background: #f4f4f4;
+    padding: 1em;
+    border-radius: 10px;
+}
+
+.question-card {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.question-card input {
+    flex: 1;
+    padding: 0.5em;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.remove-question {
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 0.3em 0.6em;
+    border-radius: 6px;
+    cursor: pointer;
+}

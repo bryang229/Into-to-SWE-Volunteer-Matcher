@@ -10,11 +10,15 @@
   </style>
 </head>
 <body>
-  <div class="nav-bar">
-    <h1 style="color: white;">Create Listing</h1>
-    <button id="logout-btn">Logout</button>
-  </div>
+  <nav>
+    <div class="nav-title"><a href="/templates/index.html">Create Listing</a></div>
 
+    <div class="dropdown">
+      <button class="dropbtn">Menu ▾</button>
+      <div class="dropdown-content" id="navLinks">
+      </div>
+    </div>
+  </nav>
   <div class="form-container">
     <h2>Create New Volunteer Listing</h2>
     <form id="listingForm">
@@ -46,6 +50,23 @@
       <div class="form-group">
         <label for="description">Description</label>
         <textarea id="description" rows="4" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>
+          <input type="checkbox" id="includeQuestionsToggle" />
+          Include application questions
+        </label>
+      </div>
+      
+      <div id="questionSection" style="display: none;">
+        <h3>Application Questions</h3>
+        <div id="questionList">
+          <div class="question-card">
+            <input type="text" value="Why are you interested in this opportunity?" readonly />
+          </div>
+        </div>
+        <button type="button" id="addQuestionBtn">Add Question</button>
       </div>
 
       <button type="submit">Submit Listing</button>
