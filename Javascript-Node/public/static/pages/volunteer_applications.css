@@ -1,0 +1,13 @@
+.container {
+    max-width: 800px;
+    margin: auto;
+    padding: 2rem;
+  }
+  
+  .application-card {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+  }

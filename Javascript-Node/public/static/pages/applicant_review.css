@@ -1,0 +1,22 @@
+.container {
+    max-width: 800px;
+    margin: auto;
+    padding: 2em;
+    font-family: Arial, sans-serif;
+  }
+  
+  .card {
+    background: #f9f9f9;
+    margin-bottom: 1.5em;
+    padding: 1.2em;
+    border-radius: 8px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.1);
+  }
+  
+  .qa-pair {
+    margin-bottom: 1em;
+  }
+  
+  h1, h2 {
+    color: #333;
+  }

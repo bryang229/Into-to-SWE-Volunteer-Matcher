@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (cachedUserData.accountType === "company")
       window.location.href = "/templates/company/company_dashboard.html";
     populateFields(cachedUserData);
+    await loadVolunteerApplications(cachedUserData);
 
   } catch (err) {
     console.error(err);
@@ -185,3 +186,51 @@ const populateFields = (user) => {
 
 };
 
+
+// Loads volunteers applications to dash board
+async function loadVolunteerApplications(user) {
+  const list = document.getElementById("applicationList");
+  list.innerHTML = ""; // Clear any existing content
+
+  if (!Array.isArray(user.applications) || user.applications.length === 0) {
+    list.innerHTML = "<li>You haven't submitted any applications yet.</li>";
+    return;
+  }
+
+  for (const { listingId, applicationId } of user.applications) {
+    try {
+      // Fetch full application
+      const appRes = await fetch(`/api/applications/application-data?applicationId=${applicationId}`);
+      const app = await appRes.json();
+
+      // Fetch listing data
+      const listingRes = await fetch(`/api/listings/listing-data?listingId=${listingId}`);
+      const listing = await listingRes.json();
+
+      const li = document.createElement("li");
+      li.className = "application-entry";
+      li.innerHTML = `
+        <h4>${listing.title}</h4>
+        <p><strong>Date:</strong> ${listing.date}</p>
+        <p><strong>Company:</strong> ${listing.companyName}</p>
+        <p><strong>Status:</strong> ${app.status}</p>
+        <p><strong>Submitted:</strong> ${new Date(app.submittedAt).toLocaleDateString()}</p>
+        ${app.edited ? `<p><em>(Edited after submission)</em></p>` : ""}
+        ${app.status === "Waiting for Review" ? `<button class="edit-app-btn" data-id="${applicationId}">Edit</button>` : ""}
+      `;
+      list.appendChild(li);
+
+    } catch (err) {
+      console.warn(`Failed to load application ${applicationId}`, err);
+    }
+  }
+
+  // Attach edit button handlers
+  document.querySelectorAll(".edit-app-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const appId = btn.dataset.id;
+      // redirect to edit-application.html with ?applicationId=...
+      window.location.href = `/templates/volunteer/edit_application.html?applicationId=${appId}`;
+    });
+  });
+}

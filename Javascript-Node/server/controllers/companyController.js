@@ -1,5 +1,6 @@
-const { db } = require('../firebase');
+const { db, admin } = require('../firebase');
 const cryptoJS = require("crypto-js");
+const { get } = require('../routes/companyRoutes');
 
 const registerCompany = async (req, res) => {
   const { uid, username, companyName, publicEmail, privateEmail, companyBio, admin_fullname } = req.body;
@@ -20,6 +21,7 @@ const registerCompany = async (req, res) => {
       publicEmail,
       companyBio,
       hashedEmail,
+      listings: [],
       username_lowercase,
       createdAt: new Date()
     };
@@ -60,6 +62,26 @@ const updateCompanyData = async(req, res) => {
   }
 }
 
+const getListings = async (req, res) => {
+  const user = req.user;
+
+  if (!user || !user.uid) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  const snapshot = await db.collection("Listings")
+    .where("creatorUid", "==", user.uid)
+    .get();
+
+  const myListings = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+
+  res.status(200).json(myListings);
+};
+
+
 const checkUsername = async (req, res) => {
   const { username } = req.query;
   if (!username || username.trim() === "") {
@@ -78,5 +100,6 @@ const checkUsername = async (req, res) => {
 module.exports = {
   registerCompany,
   updateCompanyData,
+  getListings,
   checkUsername
 };

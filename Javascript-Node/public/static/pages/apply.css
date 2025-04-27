@@ -1,0 +1,40 @@
+.content {
+    padding: 1rem;
+    max-width: 600px;
+    margin: auto;
+  }
+  
+  .listing-details {
+    background-color: #f9f9f9;
+    padding: 1em;
+    border-radius: 8px;
+    margin-bottom: 1em;
+  }
+  
+  .question-block {
+    margin-bottom: 1em;
+  }
+  
+  .question-block label {
+    display: block;
+    margin-bottom: 0.3em;
+    font-weight: bold;
+  }
+  
+  .question-block textarea {
+    width: 100%;
+    height: 80px;
+    padding: 0.5em;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    resize: vertical;
+  }
+  
+  button[type="submit"] {
+    background-color: #4caf50;
+    color: white;
+    padding: 0.6em 1.2em;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }

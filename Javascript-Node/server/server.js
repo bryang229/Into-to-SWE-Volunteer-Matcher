@@ -13,11 +13,14 @@ const authRoutes = require('./routes/authRoutes');
 const volunteerRoutes = require('./routes/volunteerRoutes');
 const companyRoutes = require('./routes/companyRoutes');
 const listingsRoutes = require('./routes/listingsRoutes');
+const applicationsRoutes = require('./routes/applicationsRoutes');
 
 app.use('/api', authRoutes);
 app.use('/api/volunteers', volunteerRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/listings', listingsRoutes);
+app.use('/api/applications', applicationsRoutes);
+
 
 
 // Static page redirect

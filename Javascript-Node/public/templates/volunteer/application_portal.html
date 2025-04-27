@@ -1,28 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Application Review</title>
-    <link rel="stylesheet" href="../../static/pages/applicationsreview.css">
+  <meta charset="UTF-8">
+  <title>Your Applications</title>
+  <link rel="stylesheet" href="../../static/base.css" />
+  <link rel="stylesheet" href="../../static/pages/volunteer_applications.css" />
 </head>
 <body>
-    <div class= "container">
-        <h1>Application Review</h1>
-        <div class="application" id="application1">
-            <h2>Applicant: John Doe</h2>
-            <p>Position: Software Engineer</p>
-            <button class="accept-btn" onclick="handleDecision('application1', 'accepted')">Accept</button>
-            <button class="deny-btn" onclick="handleDecision('application1', 'denied')">Deny</button>
-        </div>
-        <div class="application" id="application2">
-            <h2>Applicant: Jane Smith</h2>
-            <p>Position: Data Analyst</p>
-            <button class="accept-btn" onclick="handleDecision('application2', 'accepted')">Accept</button>
-            <button class="deny-btn" onclick="handleDecision('application2', 'denied')">Deny</button>
-        </div>
+  <nav>
+    <div class="nav-title"><a href="/templates/index.html">Volunteer Matcher</a></div>
+    <div class="dropdown">
+      <button class="dropbtn">Menu ▾</button>
+      <div class="dropdown-content" id="navLinks">
+        <!-- JS will populate -->
+      </div>
     </div>
-    <script src="../../lib/applicationpage/applications.js"></script>
+  </nav>
+
+  <div class="container">
+    <h1>Your Applications</h1>
+    <div id="applicationsContainer">
+      <p>Loading applications...</p>
+    </div>
+  </div>
+
+  <script type="module" src="../../lib/applications/application_portal.js"></script>
 </body>
 </html>
