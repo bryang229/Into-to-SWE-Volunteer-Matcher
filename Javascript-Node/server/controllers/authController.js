@@ -95,39 +95,18 @@ const checkUsername = async (req, res) => {
 
 //Verifies cookie session
 const verifySession = async (req, res, next) => {
-  const sessionCookie = req.cookies.session || '';
+    const sessionCookie = req.cookies.session || '';
 
-  try {
-    const decodedClaims = await admin.auth().verifySessionCookie(sessionCookie, true);
-
-    // If accountType is missing, try to lookup and patch
-    if (!decodedClaims.accountType) {
-      const uid = decodedClaims.uid;
-
-      let accountType = null;
-
-      const volunteerDoc = await db.collection("Volunteers").doc(uid).get();
-      if (volunteerDoc.exists) {
-        accountType = "volunteer";
-      } else {
-        const companyDoc = await db.collection("companies").doc(uid).get();
-        if (companyDoc.exists) accountType = "company";
-      }
-
-      // Set custom claim so it's correct in future sessions
-      if (accountType) {
-        await admin.auth().setCustomUserClaims(uid, { accountType });
-        decodedClaims.accountType = accountType;
-      }
+    try {
+        console.log('Verifying session cookie:', sessionCookie);
+        const decodedClaims = await admin.auth().verifySessionCookie(sessionCookie, true);
+        req.user = decodedClaims; // Attach user info to the request
+        console.log('Session verified for user:', decodedClaims.uid);
+        next();
+    } catch (err) {
+        console.error('Session verification failed:', err.message);
+        res.status(401).json({ error: 'Unauthorized' });
     }
-
-    req.user = decodedClaims; // Now you have uid and accountType
-    console.log(req.user.accountType, "verify session end")
-    next();
-  } catch (err) {
-    console.log('failed')
-    res.status(401).json({ error: "Unauthorized" });
-  }
 };
 
 
@@ -485,6 +464,22 @@ const getUserInfo = async (req, res) => {
   }
 };
 
+const authMiddleware = async (req, res, next) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if (!authHeader?.startsWith('Bearer ')) {
+            return res.status(401).json({ error: 'No token provided' });
+        }
+
+        const token = authHeader.split('Bearer ')[1];
+        const decodedToken = await admin.auth().verifyIdToken(token);
+        req.user = decodedToken;
+        next();
+    } catch (error) {
+        res.status(401).json({ error: 'Invalid token' });
+    }
+};
+
 module.exports = {
   sessionLogin,
   checkUsername,
@@ -493,8 +488,9 @@ module.exports = {
   verifySession,
   verifySessionIfAvailable,
   getPersonalProfile,
+  logout,
+  authMiddleware,
   getPublicProfile,
   getVolunteerProfile,
-  getCompanyProfile,
-  logout
+  getCompanyProfile
 };

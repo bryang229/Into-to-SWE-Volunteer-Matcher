@@ -31,27 +31,27 @@ export async function setupNav(accountType = null) {
     <a href="/templates/index.html">Home</a>  
     <a href="/templates/${accountType}/${accountType}_dashboard.html">Dashboard</a>
     <a href="/templates/common/profile_search.html">Search Profiles</a>
+    <a href="/templates/common/messages.html">Check your messages</a>
+    <a href="/templates/common/account_settings.html">Account Settings</a>
+    <a href="/templates/common/help.html">Help</a>
+    <a href="#" id="logoutLink">Logout</a>
       ${isCompany ?
-          `<div class="nav-dropdown">
-          <a href="#">Browse Applications ▾</a>
-          <div class="dropdown-submenu" id="applicationLinks"></div>
+        `<div class="nav-dropdown">
+        <a href="#">Browse Applications ▾</a>
+        <div class="dropdown-submenu" id="applicationLinks"></div>
+      </div>
+      <a href="/templates/company/create_listing.html">Create Listing</a>` :
+        //Browse listings could be like a search thing
+        `<a href="/templates/index.html">Browse Listings</a>        
+        <a href="/templates/volunteer/application_portal.html">Check Applications</a>
+        <div class="nav-dropdown">
+        <a href="#">Pending Applications ▾</a>
+          <div class="dropdown-submenu" id="pendingApplicationsMenu">
+          <span style="padding: 10px;">Loading...</span>
+          </div>
         </div>
-        <a href="/templates/company/create_listing.html">Create Listing</a>` :
-          //Browse listings could be like a search thing
-          `<a href="/templates/index.html">Browse Listings</a>        
-         <a href="/templates/volunteer/application_portal.html">Check Applications</a>
-         <div class="nav-dropdown">
-          <a href="#">Pending Applications ▾</a>
-           <div class="dropdown-submenu" id="pendingApplicationsMenu">
-            <span style="padding: 10px;">Loading...</span>
-            </div>
-         </div>
-        `
-        }
-      <a href="/templates/common/messages.html">Check your messages</a>
-      <a href="/templates/common/account_settings.html">Account Settings</a>
-      <a href="/templates/common/help.html">Help</a>
-      <a href="#" id="logoutLink">Logout</a>
+      `
+      }
     `;
 
       //Adding applicants pages as drop down dynamically
