@@ -6,6 +6,7 @@ const { sessionLogin,
         getUserInfo,
         getPersonalProfile,
         searchUsers,
+        getPublicProfile,
         logout
     } = require('../controllers/authController');
 
@@ -20,10 +21,12 @@ router.get('/sessionVerify', verifySession, (req, res) => {
     res.status(200).json({ uid, accountType });
     console.log(accountType)
   });
-// GET /api/auth/me
+// GET /api/me
 router.get('/me', verifySession, getPersonalProfile);
-// GET /api/auth/search?query=...
+// GET /api/search?query=...
 router.get('/search', verifySession, searchUsers);
+// GET /api/public-profile
+router.get('/public-profile', getPublicProfile);
 //GET /api/logout
 router.post('/logout', logout);
 

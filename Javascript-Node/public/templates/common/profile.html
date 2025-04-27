@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Profile</title>
+    <link rel="stylesheet" href="../../static/pages/profile.css" />
+    <link rel="stylesheet" href="../../static/base.css" />
+</head>
+
+<body>
+    <nav>
+        <div class="nav-title"><a href="/templates/index.html">Volunteer Matcher</a></div>
+        <div class="dropdown">
+            <button class="dropbtn">Menu ▾</button>
+            <div class="dropdown-content" id="navLinks">
+                <!-- setupNav will populate -->
+            </div>
+        </div>
+    </nav>
+
+    <div class="profile-container">
+        <div id="profile-header">
+            <h1 id="profileName">Loading...</h1>
+            <div id="roleTags"></div>
+        </div>
+        <div id="profileDetails"></div>
+    </div>
+
+    <script type="module" src="../../lib/common/profile.js"></script>
+</body>
+
+</html>

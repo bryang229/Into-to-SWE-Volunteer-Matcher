@@ -258,6 +258,41 @@ async function searchUsers(req, res) {
   }
 }
 
+const getPublicProfile = async (req, res) => {
+  const { uid } = req.query;
+  if (!uid) return res.status(400).json({ error: 'Missing UID' });
+
+  try {
+    let snap = await db.collection('Volunteers').doc(uid).get();
+    let type = 'volunteer';
+    if (!snap.exists) {
+      snap = await db.collection('companies').doc(uid).get();
+      type = 'company';
+    }
+    if (!snap.exists) return res.status(404).json({ error: 'User not found' });
+
+    const data = snap.data();
+    const publicFields = {};
+
+    const allowedFields = ['fullname', 'bio', 'interests', 'location', 'experience', 'companyName', 'avatarUrl', 'listings', 'privacyFields'];
+    allowedFields.forEach(field => {
+      if (data[field] !== undefined) {
+        if (Array.isArray(data.privacyFields) && data.privacyFields.includes(field)) {
+          // Private field, skip
+        } else {
+          publicFields[field] = data[field];
+        }
+      }
+    });
+
+    res.json({ accountType: type, ...publicFields });
+  } catch (err) {
+    console.error('Profile API error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
 const logout = async (req, res) => {
   try {
     const sessionCookie = req.cookies.session || '';
@@ -382,5 +417,6 @@ module.exports = {
   verifySession,
   verifySessionIfAvailable,
   getPersonalProfile,
+  getPublicProfile,
   logout
 };

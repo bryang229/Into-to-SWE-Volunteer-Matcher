@@ -1,0 +1,48 @@
+.profile-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+  }
+  
+  #profile-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  #roleTags {
+    margin-top: 0.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .role-tag {
+    padding: 0.3rem 0.7rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    background-color: #eee;
+    color: #555;
+  }
+  
+  .role-volunteer {
+    background-color: #d1e7dd;
+    color: #0f5132;
+  }
+  
+  .role-company {
+    background-color: #cfe2ff;
+    color: #084298;
+  }
+  
+  .role-previous {
+    background-color: #e2e3e5; /* Light gray background */
+    color: #41464b; /* Dark gray text */
+  }
+  
+  #profileDetails p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+  }
+  
