@@ -1,4 +1,4 @@
-import { fetchUserData } from './dashboard_data.js';
+import { fetchUserData, fetchVolunteerInvitesReceived } from './dashboard_data.js';
 import { setupNav } from '../common/nav_control.js'
 
 let cachedUserData;
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       window.location.href = "/templates/company/company_dashboard.html";
     populateFields(cachedUserData);
     await loadVolunteerApplications(cachedUserData);
-
+    await renderReceivedInvites();
   } catch (err) {
     console.error(err);
 
@@ -233,4 +233,32 @@ async function loadVolunteerApplications(user) {
       window.location.href = `/templates/volunteer/edit_application.html?applicationId=${appId}`;
     });
   });
+}
+
+async function renderReceivedInvites() {
+  const inviteList = document.getElementById('inviteList');
+  if (!inviteList) return;
+
+  try {
+    const invites = await fetchVolunteerInvitesReceived();
+    if (invites.length === 0) {
+      inviteList.innerHTML = '<p style="text-align:center;">No invites received yet.</p>';
+      return;
+    }
+
+    invites.forEach(invite => {
+      const card = document.createElement('div');
+      card.className = 'invite-card';
+      card.innerHTML = `
+        <strong>${invite.listingTitle || 'Untitled Listing'}</strong>
+        <p>Status: ${invite.status}</p>
+        <p>From: <a href="/templates/common/profile.html?uid=${invite.companyUid}">View Company</a></p>
+      `;
+      inviteList.appendChild(card);
+    });
+
+  } catch (err) {
+    console.error('Error loading invites:', err);
+    inviteList.innerHTML = '<p style="text-align:center;color:red;">Failed to load invites.</p>';
+  }
 }
