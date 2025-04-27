@@ -7,6 +7,8 @@ const { sessionLogin,
         getPersonalProfile,
         searchUsers,
         getPublicProfile,
+        getVolunteerProfile,
+        getCompanyProfile,
         logout
     } = require('../controllers/authController');
 
@@ -27,6 +29,10 @@ router.get('/me', verifySession, getPersonalProfile);
 router.get('/search', verifySession, searchUsers);
 // GET /api/public-profile
 router.get('/public-profile', getPublicProfile);
+//GET /api/volunteer-profile?=...
+router.get('/volunteer-profile', getVolunteerProfile);
+//GET /api/company-profile?=...
+router.get('/company-profile', getCompanyProfile);
 //GET /api/logout
 router.post('/logout', logout);
 

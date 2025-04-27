@@ -1,52 +1,56 @@
-import { setupNav } from '../common/nav_control.js';
+import { setupNav } from './nav_control.js';
+import { renderVolunteerProfile, renderCompanyProfile } from '../profile/profile_handler.js';
+import { fetchVolunteerProfile, fetchCompanyProfile, fetchMyInfo, fetchVolunteerApplications, fetchInvitesSent } from '../profile/profile_backend.js';
 
-document.addEventListener('DOMContentLoaded', async () => {
+// Main startup
+(async function initProfile() {
   await setupNav();
 
   const params = new URLSearchParams(window.location.search);
-  const uid = params.get('uid');
+  const viewingUid = params.get('uid');
 
-  if (!uid) {
-    document.body.innerHTML = '<p>Invalid profile.</p>';
+  if (!viewingUid) {
+    document.getElementById('profileName').textContent = 'Missing profile ID';
     return;
   }
 
   try {
-    const res = await fetch(`/api/public-profile?uid=${uid}`, { credentials: 'include' });
-    if (!res.ok) throw new Error('Failed to fetch profile');
+    const me = await fetchMyInfo();
+    const viewingSelf = (me.uid === viewingUid);
 
-    const data = await res.json();
-    document.getElementById('profileName').textContent = data.fullname || data.companyName || 'Unknown';
+    // Try fetching volunteer profile first
+    try {
+      const volunteerData = await fetchVolunteerProfile(viewingUid);
 
-    const roleTags = document.getElementById('roleTags');
-    roleTags.innerHTML = '';
+      if (me.accountType === 'company') {
+        const apps = await fetchVolunteerApplications(viewingUid);
+        const invites = await fetchInvitesSent(viewingUid);
+        const listings = await fetchCompanyListings();
 
-    if (data.accountType === 'volunteer') {
-      roleTags.innerHTML += '<span class="role-tag role-volunteer">Volunteer</span>';
-
-      if (Array.isArray(data.listings)) {
-        data.listings.forEach(listing => {
-          if (listing.status === 'active') {
-            roleTags.innerHTML += `<span class="role-tag role-volunteer">Volunteer @ ${listing.companyName || 'Unknown'}</span>`;
-          } else {
-            roleTags.innerHTML += `<span class="role-tag role-past">Past Volunteer @ ${listing.companyName || 'Unknown'}</span>`;
-          }
-        });
+        renderVolunteerProfile(volunteerData, apps, invites, listings, viewingUid);
+      } else {
+        renderVolunteerProfile(volunteerData);
       }
-    } else if (data.accountType === 'company') {
-      roleTags.innerHTML += '<span class="role-tag role-company">Company</span>';
+
+    } catch (volErr) {
+      // Volunteer not found, maybe a company
+      try {
+        const companyData = await fetchCompanyProfile(viewingUid);
+        renderCompanyProfile(companyData, viewingSelf);
+      } catch (compErr) {
+        console.error('Company profile not found.');
+        document.getElementById('publicInfo').innerHTML = '<p>Profile not found.</p>';
+      }
     }
 
-    const details = document.getElementById('profileDetails');
-    details.innerHTML = '';
-
-    if (data.bio) details.innerHTML += `<p><strong>Bio:</strong> ${data.bio}</p>`;
-    if (data.location) details.innerHTML += `<p><strong>Location:</strong> ${data.location}</p>`;
-    if (data.interests?.length) details.innerHTML += `<p><strong>Interests:</strong> ${data.interests.join(', ')}</p>`;
-    if (data.experience) details.innerHTML += `<p><strong>Experience:</strong> ${data.experience} years</p>`;
-
   } catch (err) {
-    console.error('Profile load error:', err);
-    document.body.innerHTML = '<p>Failed to load profile.</p>';
+    console.error('Profile access error:', err);
+    document.getElementById('publicInfo').innerHTML = '<p>Access denied or session expired.</p>';
   }
-});
+})();
+
+async function fetchCompanyListings() {
+  const res = await fetch('/api/companies/my-listings', { credentials: 'include' });
+  if (!res.ok) throw new Error('Failed to fetch listings');
+  return await res.json();
+}

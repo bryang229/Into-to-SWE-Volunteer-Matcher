@@ -30,6 +30,7 @@ export async function setupNav(accountType = null) {
       navLinks.innerHTML = `
     <a href="/templates/index.html">Home</a>  
     <a href="/templates/${accountType}/${accountType}_dashboard.html">Dashboard</a>
+    <a href="/templates/common/profile_search.html">Search Profiles</a>
       ${isCompany ?
           `<div class="nav-dropdown">
           <a href="#">Browse Applications ▾</a>
@@ -116,10 +117,9 @@ export async function setupNav(accountType = null) {
     <a href="/templates/common/help.html">Help</a>
   `;
     }
-    await monitorConnection({ dotId: 'globalConnectionDot' });
     return accountType;
 
-  } catch {
+  } catch (e) {
     navLinks.innerHTML = `
       <a href="/templates/index.html">Home</a>  
       <a href="/templates/auth/login.html">Log In</a>

@@ -292,6 +292,82 @@ const getPublicProfile = async (req, res) => {
   }
 };
 
+// Fetch volunteer profile
+async function getVolunteerProfile(req, res) {
+  const { uid } = req.query;
+  if (!uid) return res.status(400).json({ error: 'Missing uid' });
+
+  try {
+    const docSnap = await db.collection('Volunteers').doc(uid).get();
+    if (!docSnap.exists) return res.status(404).json({ error: 'Volunteer not found' });
+
+    const data = docSnap.data();
+    const profile = {
+      fullname: data.fullname || '',
+      interests: data.interests || [],
+      experience: data.experience || 0,
+      age: data.age || null,
+      bio: data.bio || '',
+      location: data.location || '',
+      activeListings: [],
+      previousListings: []
+    };
+
+    if (Array.isArray(data.applications)) {
+      const active = [];
+      const past = [];
+
+      for (const app of data.applications) {
+        const appSnap = await db.collection('Applications').doc(app.applicationId).get();
+        if (appSnap.exists) {
+          const appData = appSnap.data();
+          if (appData.status && appData.status.toLowerCase() === 'accepted') {
+            active.push(app.listingId);
+          } else {
+            past.push(app.listingId);
+          }
+        }
+      }
+
+      profile.activeListings = active;
+      profile.previousListings = past;
+    }
+
+    res.json(profile);
+  } catch (err) {
+    console.error('Volunteer profile error:', err);
+    res.status(500).json({ error: 'Failed to load volunteer profile' });
+  }
+}
+
+// Fetch company profile
+async function getCompanyProfile(req, res) {
+  const { uid } = req.query;
+  if (!uid) return res.status(400).json({ error: 'Missing uid' });
+
+  try {
+    const docSnap = await db.collection('companies').doc(uid).get();
+    if (!docSnap.exists) return res.status(404).json({ error: 'Company not found' });
+
+    const data = docSnap.data();
+    const profile = {
+      companyName: data.companyName || '',
+      companyBio: data.companyBio || '',
+      publicEmail: data.publicEmail || '',
+      listings: []
+    };
+
+    if (Array.isArray(data.listings)) {
+      profile.listings = data.listings;
+    }
+
+    res.json(profile);
+  } catch (err) {
+    console.error('Company profile error:', err);
+    res.status(500).json({ error: 'Failed to load company profile' });
+  }
+}
+
 
 const logout = async (req, res) => {
   try {
@@ -418,5 +494,7 @@ module.exports = {
   verifySessionIfAvailable,
   getPersonalProfile,
   getPublicProfile,
+  getVolunteerProfile,
+  getCompanyProfile,
   logout
 };
