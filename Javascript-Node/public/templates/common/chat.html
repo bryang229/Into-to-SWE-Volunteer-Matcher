@@ -21,8 +21,12 @@
 
     <div class="chat-container">
         <div class="chat-header">
-            <h2 id="chatPartnerName">Chat</h2>
-        </div>
+            <button class="back-btn" id="backToList">← Back</button>
+            <div id="chatHeader">
+              <h2 id="chatPartnerName">Chat</h2>
+              <div id="typingIndicator" style="font-size: 0.85rem; color: #999;"></div>
+            </div>
+          </div>
         <div class="chat-messages" id="chatMessages">
             <!-- Populated by chat.js -->
         </div>

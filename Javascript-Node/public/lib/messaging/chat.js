@@ -1,6 +1,15 @@
 import { db } from '../auth/firebase-config.js';
 import { setupNav } from '../common/nav_control.js';
-import { collection, doc, query, orderBy, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
+import {
+  collection,
+  doc,
+  query,
+  orderBy,
+  onSnapshot,
+  addDoc,
+  updateDoc,
+  serverTimestamp
+} from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   await setupNav();
@@ -11,48 +20,44 @@ document.addEventListener('DOMContentLoaded', async () => {
   const participantType = params.get('participantType');
 
   const partnerNameEl = document.getElementById('chatPartnerName');
+  const typingIndicator = document.getElementById('typingIndicator');
   const messagesEl = document.getElementById('chatMessages');
   const inputEl = document.getElementById('messageInput');
   const sendBtn = document.getElementById('sendBtn');
 
   let currentUid = null;
+  let partnerUid = null;
   let unsubscribe = null;
 
-  // Fetch current user ID first
   async function fetchMyInfo() {
     const res = await fetch('/api/me', { credentials: 'include' });
     const user = await res.json();
     return user.uid;
   }
 
-  // If no conversation ID, create one
   async function ensureConversation() {
     if (!convoId) {
       if (!participantId || !participantType) {
         alert('Missing conversation identifiers.');
         return;
       }
-      const res = await fetch(
-        `/api/conversations?participantId=${encodeURIComponent(participantId)}&participantType=${encodeURIComponent(participantType)}`,
-        { method: 'POST', credentials: 'include' }
-      );
+      const res = await fetch(`/api/conversations?participantId=${encodeURIComponent(participantId)}&participantType=${encodeURIComponent(participantType)}`, { method: 'POST', credentials: 'include' });
       const data = await res.json();
       convoId = data.id;
       window.history.replaceState({}, '', `?conversationId=${convoId}`);
     }
   }
 
-  async function loadPartnerName() {
-    try {
-      const res = await fetch(`/api/conversations/chatlog?conversationId=${encodeURIComponent(convoId)}`, {
-        credentials: 'include'
-      });
-      const data = await res.json();
-      partnerNameEl.textContent = data.partnerName || 'Chat';
-    } catch (err) {
-      console.error('Error loading partner name:', err);
-    }
-  }
+async function loadPartnerName() {
+  const res = await fetch(`/api/conversations/chatlog?conversationId=${encodeURIComponent(convoId)}`, {
+    credentials: 'include'
+  });
+  const data = await res.json();
+  partnerNameEl.textContent = data.partnerName || 'Chat';
+
+  // NEW:
+  partnerUid = data.partnerUid;
+}
 
   function listenToMessages() {
     const convoRef = doc(db, 'Conversations', convoId);
@@ -72,11 +77,30 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
       renderMessages(messages);
     });
+
+    // Also listen for typing status
+    onSnapshot(convoRef, snapshot => {
+      const data = snapshot.data();
+      if (data?.typing) {
+        const typingStatus = data.typing[partnerUid];
+        if (typingStatus) {
+          typingIndicator.innerHTML = `
+            <div class="typing-indicator">
+              Typing
+              <div class="typing-dots">
+                <span></span><span></span><span></span>
+              </div>
+            </div>
+          `;
+        } else {
+          typingIndicator.innerHTML = '';
+        }
+      }
+    });
   }
 
   function renderMessages(messages) {
     messagesEl.innerHTML = '';
-
     messages.forEach(msg => {
       const div = document.createElement('div');
       div.className = `message ${msg.sentByMe ? 'sent' : 'received'}`;
@@ -84,7 +108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       let checkMarks = '';
       if (msg.sentByMe) {
         if (msg.read) {
-          checkMarks = '<span class="read-receipt">✓✓</span>';
+          checkMarks = '<span class="read-receipt read">✓✓</span>';
         } else {
           checkMarks = '<span class="read-receipt">✓</span>';
         }
@@ -107,51 +131,64 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!text) return;
 
     try {
-      const res = await fetch(`/api/conversations/chatlog?conversationId=${encodeURIComponent(convoId)}`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text })
+      const convoRef = doc(db, 'Conversations', convoId);
+
+      await addDoc(collection(convoRef, 'Messages'), {
+        text,
+        senderUid: currentUid,
+        sentAt: new Date().toISOString(),
+        readBy: [currentUid]
       });
-      if (!res.ok) throw new Error('Failed to send message');
+
+      // Update last message preview
+      await updateDoc(convoRef, {
+        lastMessage: text,
+        lastMessageAt: serverTimestamp(),
+        [`typing.${currentUid}`]: false
+      });
+
+      await setLastOnline();
       inputEl.value = '';
-      // No need to manually reload, onSnapshot handles updates!
+
     } catch (err) {
       console.error('Send error:', err);
       alert('Failed to send message.');
     }
   });
 
-  // Main startup
+  inputEl.addEventListener('input', () => {
+    setTypingStatus(inputEl.value.trim() !== '');
+  });
+
+  async function setTypingStatus(isTyping) {
+    const convoRef = doc(db, 'Conversations', convoId);
+    await updateDoc(convoRef, {
+      [`typing.${currentUid}`]: isTyping
+    });
+  }
+
+  async function setLastOnline() {
+    // Update last seen when sending a message
+    try {
+      await updateDoc(doc(db, 'Volunteers', currentUid), { lastOnline: serverTimestamp() });
+    } catch (e) {
+      try {
+        await updateDoc(doc(db, 'companies', currentUid), { lastOnline: serverTimestamp() });
+      } catch (e) {
+        console.warn('Failed to update lastOnline');
+      }
+    }
+  }
+
+  // Startup
   try {
     currentUid = await fetchMyInfo();
-  } catch (err) {
-    console.error('Error fetching my info:', err);
-    alert('Failed to fetch your account info.');
-    return;
-  }
-
-  try {
+    partnerUid = participantId; // Available from URL when creating conversation
     await ensureConversation();
-  } catch (err) {
-    console.error('Error ensuring conversation:', err);
-    alert('Failed to find or create conversation.');
-    return;
-  }
-
-  try {
     await loadPartnerName();
-  } catch (err) {
-    console.error('Error loading partner name:', err);
-    alert('Failed to load chat details.');
-    return;
-  }
-
-  try {
     listenToMessages();
   } catch (err) {
-    console.error('Error listening to messages:', err);
-    alert('Failed to start live updates.');
-    return;
+    console.error('Error starting chat:', err);
+    alert('Could not load conversation.');
   }
 });

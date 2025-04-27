@@ -113,13 +113,13 @@ body {
     color: #333;
 }
 
-/* Chat messages area with bottom margin to accommodate sticky input /
-    .chat-messages {
+/* Chat messages area with bottom margin to accommodate sticky input */
+.chat-messages {
     flex: 1;
     padding: 0.75rem;
     overflow-y: auto;
     background-color: #fff;
-    margin-bottom: 3.5rem; / ensure space for input */
+    margin-bottom: 3.5rem;/ ensure space for input */
 }
 
 /* Chat input area - sticky at bottom */
@@ -156,6 +156,68 @@ body {
 
 .chat-input button:hover {
     background-color: #187bcd;
+}
+
+.read-receipt {
+    font-size: 0.7rem;
+    color: gray;
+}
+
+.read-receipt.read {
+    color: #1e90ff;
+    /* Blue when read */
+}
+
+#typingIndicator {
+    font-size: 0.85rem;
+    color: #777;
+    margin-left: 1rem;
+    font-style: italic;
+}
+
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    height: 20px;
+    font-size: 0.9rem;
+    color: #999;
+    margin-top: 4px;
+}
+
+.typing-dots {
+    display: inline-flex;
+    margin-left: 0.5rem;
+}
+
+.typing-dots span {
+    width: 6px;
+    height: 6px;
+    margin: 0 2px;
+    background-color: #999;
+    border-radius: 50%;
+    animation: blink 1.4s infinite both;
+}
+
+.typing-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 0.2;
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.2;
+    }
 }
 
 /* Responsive adjustments */
