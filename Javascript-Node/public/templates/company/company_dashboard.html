@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Company Dashboard</title>
@@ -85,10 +86,16 @@
 
       <section class="company-listings">
         <h3>Your Volunteer Listings</h3>
-        <a href = "/templates/company/create_listing.html"> <button> + Create New Listing</button> </a>
+        <a href="/templates/company/create_listing.html"> <button> + Create New Listing</button> </a>
         <ul id="listingList">
           <!-- Dynamic list of existing listings -->
         </ul>
+      </section>
+      <section class="dashboard-invites">
+        <h3>Invites You've Sent</h3>
+        <div id="inviteList">
+          <!-- Populated dynamically -->
+        </div>
       </section>
     </section>
 
@@ -101,4 +108,5 @@
   <script type="module" src="../../lib/common/nav_control.js"></script>
   <script type="module" src="../../lib/dashboard/company_dom.js"></script>
 </body>
+
 </html>

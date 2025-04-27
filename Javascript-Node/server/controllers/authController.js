@@ -95,39 +95,18 @@ const checkUsername = async (req, res) => {
 
 //Verifies cookie session
 const verifySession = async (req, res, next) => {
-  const sessionCookie = req.cookies.session || '';
+    const sessionCookie = req.cookies.session || '';
 
-  try {
-    const decodedClaims = await admin.auth().verifySessionCookie(sessionCookie, true);
-
-    // If accountType is missing, try to lookup and patch
-    if (!decodedClaims.accountType) {
-      const uid = decodedClaims.uid;
-
-      let accountType = null;
-
-      const volunteerDoc = await db.collection("Volunteers").doc(uid).get();
-      if (volunteerDoc.exists) {
-        accountType = "volunteer";
-      } else {
-        const companyDoc = await db.collection("companies").doc(uid).get();
-        if (companyDoc.exists) accountType = "company";
-      }
-
-      // Set custom claim so it's correct in future sessions
-      if (accountType) {
-        await admin.auth().setCustomUserClaims(uid, { accountType });
-        decodedClaims.accountType = accountType;
-      }
+    try {
+        console.log('Verifying session cookie:', sessionCookie);
+        const decodedClaims = await admin.auth().verifySessionCookie(sessionCookie, true);
+        req.user = decodedClaims; // Attach user info to the request
+        console.log('Session verified for user:', decodedClaims.uid);
+        next();
+    } catch (err) {
+        console.error('Session verification failed:', err.message);
+        res.status(401).json({ error: 'Unauthorized' });
     }
-
-    req.user = decodedClaims; // Now you have uid and accountType
-    console.log(req.user.accountType, "verify session end")
-    next();
-  } catch (err) {
-    console.log('failed')
-    res.status(401).json({ error: "Unauthorized" });
-  }
 };
 
 
@@ -208,6 +187,166 @@ const getPersonalProfile = async (req, res) => {
     ...profileDoc.data()
   });
 };
+
+async function searchUsers(req, res) {
+  const q = (req.query.query || '').trim().toLowerCase();
+  if (!q) {
+    return res.json([]); // no query, return empty
+  }
+  console.log(q)
+  try {
+    // 1️ Search volunteers by username_lowercase
+    const volSnap = await db.collection('Volunteers')
+      .where('username_lowercase', '>=', q)
+      .where('username_lowercase', '<=', q + '\uf8ff')
+      .limit(10)
+      .get();
+
+    const volunteers = volSnap.docs.map(doc => {
+      const d = doc.data();
+      return {
+        uid: doc.id,
+        name: d.fullname || d.username,
+        avatarUrl: d.avatarUrl || '',
+        type: 'volunteer'
+      };
+    });
+
+    // 2️ Search companies by companyName_lowercase
+    const compSnap = await db.collection('companies')
+      .where('username_lowercase', '>=', q)
+      .where('username_lowercase', '<=', q + '\uf8ff')
+      .limit(10)
+      .get();
+
+    const companies = compSnap.docs.map(doc => {
+      const d = doc.data();
+      return {
+        uid: doc.id,
+        name: d.companyName || d.name,
+        avatarUrl: d.avatarUrl || '',
+        type: 'company'
+      };
+    });
+
+    // 3️ Merge & return
+    res.json([...volunteers, ...companies]);
+  } catch (err) {
+    console.error("User search failed:", err);
+    res.status(500).json({ error: 'Search failed' });
+  }
+}
+
+const getPublicProfile = async (req, res) => {
+  const { uid } = req.query;
+  if (!uid) return res.status(400).json({ error: 'Missing UID' });
+
+  try {
+    let snap = await db.collection('Volunteers').doc(uid).get();
+    let type = 'volunteer';
+    if (!snap.exists) {
+      snap = await db.collection('companies').doc(uid).get();
+      type = 'company';
+    }
+    if (!snap.exists) return res.status(404).json({ error: 'User not found' });
+
+    const data = snap.data();
+    const publicFields = {};
+
+    const allowedFields = ['fullname', 'bio', 'interests', 'location', 'experience', 'companyName', 'avatarUrl', 'listings', 'privacyFields'];
+    allowedFields.forEach(field => {
+      if (data[field] !== undefined) {
+        if (Array.isArray(data.privacyFields) && data.privacyFields.includes(field)) {
+          // Private field, skip
+        } else {
+          publicFields[field] = data[field];
+        }
+      }
+    });
+
+    res.json({ accountType: type, ...publicFields });
+  } catch (err) {
+    console.error('Profile API error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+// Fetch volunteer profile
+async function getVolunteerProfile(req, res) {
+  const { uid } = req.query;
+  if (!uid) return res.status(400).json({ error: 'Missing uid' });
+
+  try {
+    const docSnap = await db.collection('Volunteers').doc(uid).get();
+    if (!docSnap.exists) return res.status(404).json({ error: 'Volunteer not found' });
+
+    const data = docSnap.data();
+    const profile = {
+      fullname: data.fullname || '',
+      interests: data.interests || [],
+      experience: data.experience || 0,
+      age: data.age || null,
+      bio: data.bio || '',
+      location: data.location || '',
+      activeListings: [],
+      previousListings: []
+    };
+
+    if (Array.isArray(data.applications)) {
+      const active = [];
+      const past = [];
+
+      for (const app of data.applications) {
+        const appSnap = await db.collection('Applications').doc(app.applicationId).get();
+        if (appSnap.exists) {
+          const appData = appSnap.data();
+          if (appData.status && appData.status.toLowerCase() === 'accepted') {
+            active.push(app.listingId);
+          } else {
+            past.push(app.listingId);
+          }
+        }
+      }
+
+      profile.activeListings = active;
+      profile.previousListings = past;
+    }
+
+    res.json(profile);
+  } catch (err) {
+    console.error('Volunteer profile error:', err);
+    res.status(500).json({ error: 'Failed to load volunteer profile' });
+  }
+}
+
+// Fetch company profile
+async function getCompanyProfile(req, res) {
+  const { uid } = req.query;
+  if (!uid) return res.status(400).json({ error: 'Missing uid' });
+
+  try {
+    const docSnap = await db.collection('companies').doc(uid).get();
+    if (!docSnap.exists) return res.status(404).json({ error: 'Company not found' });
+
+    const data = docSnap.data();
+    const profile = {
+      companyName: data.companyName || '',
+      companyBio: data.companyBio || '',
+      publicEmail: data.publicEmail || '',
+      listings: []
+    };
+
+    if (Array.isArray(data.listings)) {
+      profile.listings = data.listings;
+    }
+
+    res.json(profile);
+  } catch (err) {
+    console.error('Company profile error:', err);
+    res.status(500).json({ error: 'Failed to load company profile' });
+  }
+}
+
 
 const logout = async (req, res) => {
   try {
@@ -325,12 +464,33 @@ const getUserInfo = async (req, res) => {
   }
 };
 
+const authMiddleware = async (req, res, next) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if (!authHeader?.startsWith('Bearer ')) {
+            return res.status(401).json({ error: 'No token provided' });
+        }
+
+        const token = authHeader.split('Bearer ')[1];
+        const decodedToken = await admin.auth().verifyIdToken(token);
+        req.user = decodedToken;
+        next();
+    } catch (error) {
+        res.status(401).json({ error: 'Invalid token' });
+    }
+};
+
 module.exports = {
   sessionLogin,
   checkUsername,
   getUserInfo,
+  searchUsers,
   verifySession,
   verifySessionIfAvailable,
   getPersonalProfile,
-  logout
+  logout,
+  authMiddleware,
+  getPublicProfile,
+  getVolunteerProfile,
+  getCompanyProfile
 };

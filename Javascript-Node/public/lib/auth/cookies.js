@@ -9,19 +9,16 @@ export async function logout() {
 
 export async function verifyCookiesSession() {
   try {
-    const res = await fetch('/api/sessionVerify');
+    const res = await fetch('/api/sessionVerify', { credentials: 'include' });
 
     if (!res.ok) {
-      // Optional: log status or handle differently
-      throw new Error(`Server responded with status ${res.status}`);
+      return { accountType: null }; // Explicitly say "no accountType"
     }
 
-    const res_body = await res.json();
-    return {
-      accountType: res_body.accountType
-    };
+    const data = await res.json();
+    return { accountType: data.accountType || null }; // default if missing
   } catch (err) {
-    console.error("Session verification failed:", err.message);
-    return { message: "Failed to verify session, user could be logged out" };
+    console.warn("verifyCookiesSession failed:", err.message);
+    return { accountType: null }; // fallback
   }
 }

@@ -163,6 +163,26 @@ const getApplications = async (req, res) => {
   res.status(200).json(applications);
 };
 
+// Get invites for the logged-in volunteer
+async function getVolunteerInvites(req, res) {
+  const uid = req.user.uid;
+
+  try {
+    const invitesSnap = await db.collection('VolunteerInvitations')
+      .where('volunteerUid', '==', uid)
+      .orderBy('sentAt', 'desc')
+      .get();
+
+    const invites = invitesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    
+    res.json(invites);
+  } catch (err) {
+    console.error('Volunteer invites fetch error:', err);
+    res.status(500).json({ error: 'Failed to fetch your invites.' });
+  }
+}
+
+
 //Export functions so they can be used in routers to link the function to the route!
 module.exports = {
   registerVolunteer,
@@ -171,5 +191,6 @@ module.exports = {
   getVolunteers,
   getVolunteerByUsername,
   checkUsername,
+  getVolunteerInvites,
   getApplications
 };

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Start New Chat</title>
+    <link rel="stylesheet" href="../../static/pages/messaging.css" />
+    <link rel="stylesheet" href="../../static/base.css" />
+    
+</head>
+
+<body>
+    <nav>
+        <div class="nav-title"><a href="/templates/index.html">Volunteer Matcher</a></div>
+        <div class="dropdown">
+            <button class="dropbtn">Menu ▾</button>
+            <div class="dropdown-content" id="navLinks">
+                <!-- JS will populate -->
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>New Chat</h1>
+        <input type="text" id="userSearch" placeholder="Search for volunteers or companies..." autocomplete="off" />
+        <ul id="suggestions" class="chat-list" style="margin-top:0.5rem;
+      max-height:300px; overflow-y:auto; padding:0;
+      list-style:none;
+    "></ul>
+    </div>
+
+    <script type="module" src="../../lib/messaging/new_chat.js"></script>
+</body>
+
+</html>

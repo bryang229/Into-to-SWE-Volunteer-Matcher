@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Search Profiles</title>
+    <link rel="stylesheet" href="../../static/base.css">
+    <link rel="stylesheet" href="../../static/pages/profile_search.css">
+</head>
+
+<body>
+    <nav>
+        <div class="nav-title"><a href="/templates/index.html">Volunteer Matcher</a></div>
+        <div class="dropdown">
+            <button class="dropbtn">Menu ▾</button>
+            <div class="dropdown-content" id="navLinks">
+                <!-- setupNav() injects links -->
+            </div>
+        </div>
+    </nav>
+
+    <main class="search-container">
+        <h1>Search Profiles</h1>
+        <input id="searchInput" type="text" placeholder="Enter username or company name...">
+        <div id="searchResults"></div>
+    </main>
+
+    <script type="module" src="../../lib/common/profile_search.js"></script>
+</body>
+
+</html>

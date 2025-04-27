@@ -4,22 +4,33 @@ const {
     registerCompany,
     updateCompanyData,
     getListings,
+    checkIfApplicant,
+    inviteVolunteer,
+    getCompanyInvitesSent,
+    getInvitesForVolunteer,
     checkUsername
 } = require('../controllers/companyController');
 const { verifySession } = require('../controllers/authController');
 
-//sign up new company: POST /api/company/register
+// Company registration
 router.post('/register', registerCompany);
-//POST /api/company/update
 router.post('/update', verifySession, updateCompanyData);
 
-//GET /api/company/my-listings
-router.get("/my-listings", verifySession, getListings);
+// Listings
+router.get('/my-listings', verifySession, getListings);
 
-//check if company username used (TODO: make so check-username works by check if company/volunteer username is taken)
-//GET /api/company/check-username?username=username_to_lookup
+// Applications and Invites
+router.get('/checkIfApplicant', verifySession, checkIfApplicant);
+// Invite volunteer to a listing
+router.post('/invite-volunteer', verifySession, inviteVolunteer);
+
+// Add this NEW route
+router.get('/invites-sent', verifySession, getCompanyInvitesSent);
+
+// (Optional already exists) Get invites for a specific volunteer
+router.get('/invites-for-volunteer', verifySession, getInvitesForVolunteer);
+
+// Username Check
 router.get('/check-username', checkUsername);
-
-
 
 module.exports = router;
