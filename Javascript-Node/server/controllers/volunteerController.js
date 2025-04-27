@@ -138,7 +138,7 @@ const getApplications = async (req, res) => {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  const volunteerDoc = await db.collection("volunteers").doc(user.uid).get();
+  const volunteerDoc = await db.collection("Volunteers").doc(user.uid).get();
   if (!volunteerDoc.exists) {
     return res.status(404).json({ error: "Volunteer profile not found" });
   }
