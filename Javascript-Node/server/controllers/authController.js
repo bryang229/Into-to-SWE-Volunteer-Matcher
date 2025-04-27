@@ -235,6 +235,15 @@ const logout = async (req, res) => {
       maxAge: 0
     });
 
+    res.clearCookie("accountType", {
+      httpOnly: false,
+      secure: false,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 0
+    });
+
+
     console.log("[LOGOUT] Cookie cleared");
     return res.status(200).json({ message: "Successfully logged out" });
   } catch (err) {
