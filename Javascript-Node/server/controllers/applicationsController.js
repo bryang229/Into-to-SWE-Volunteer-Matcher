@@ -23,8 +23,12 @@ async function apply(req, res) {
   }
 
   // Proceed with submission
-  const newAppRef = await db.collection("Applications").add({
+  const listingDoc = await db.collection("Listings").doc(listingId).get();
+  const listingData = listingDoc.exists ? listingDoc.data() : {};
+  
+  await db.collection("Applications").add({
     listingId,
+    listingTitle: listingData.title || "Untitled Listing",
     applicantUid: user.uid,
     answers,
     submittedAt: new Date().toISOString(),

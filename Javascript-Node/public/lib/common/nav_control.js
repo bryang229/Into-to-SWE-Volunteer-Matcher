@@ -123,6 +123,12 @@ export async function setupNav(accountType = null) {
           //Browse listings could be like a search thing
           `<a href="/templates/index.html">Browse Listings</a>        
          <a href="/templates/volunteer/application_portal.html">Check Applications</a>
+         <div class="nav-dropdown">
+          <a href="#">Pending Applications ▾</a>
+           <div class="dropdown-submenu" id="pendingApplicationsMenu">
+            <span style="padding: 10px;">Loading...</span>
+            </div>
+         </div>
         `
         }
       <a href="/templates/index.html">Home</a>  
@@ -134,26 +140,49 @@ export async function setupNav(accountType = null) {
       //Adding applicants pages as drop down dynamically
       if (isCompany) {
         try {
-          const user = await fetchUserData(); // get UID, companyName, etc.
-          const res = await fetch("/api/listings/");
-          const listings = await res.json();
+          const res = await fetch("/api/company/my-listings", { credentials: "include" });
+          const myListings = await res.json();
 
-          const myListings = listings.filter(l => l.creatorUid === user.uid);
           const menu = document.getElementById("applicationLinks");
-
-          myListings.forEach(listing => {
-            menu.innerHTML += `
-            <a href="/templates/company/applicants.html?listingId=${listing.id}">
-              ${listing.title || "Untitled Listing"}
-            </a>
-          `;
-          });
 
           if (myListings.length === 0) {
             menu.innerHTML = `<span style="padding: 10px;">No listings yet</span>`;
+          } else {
+            myListings.forEach(listing => {
+              menu.innerHTML += `
+                <a href="/templates/company/applicants.html?listingId=${listing.id}">
+                  ${listing.title || "Untitled Listing"}
+                </a>
+              `;
+            });
           }
         } catch (err) {
           console.warn("Error loading listings for nav:", err);
+        }
+      } else {
+        // Volunteers
+        try {
+          const userRes = await fetch("/api/volunteers/my-applications", { credentials: "include" });
+          const applications = await userRes.json();
+
+          const menu = document.getElementById("pendingApplicationsMenu");
+          menu.innerHTML = ""; // Clear "Loading..." text
+
+          const pendingApps = applications.filter(app => app.status.toLowerCase() === "waiting for review");
+
+          if (pendingApps.length === 0) {
+            menu.innerHTML = `<span style="padding: 10px;">No pending applications</span>`;
+          } else {
+            pendingApps.forEach(app => {
+              menu.innerHTML += `
+                <a href="/templates/volunteer/volunteer_application_review.html?applicationId=${app.id}">
+                  ${app.listingTitle || "Unknown Listing"}
+                </a>
+              `;
+            });
+          }
+        } catch (err) {
+          console.error("Failed to load volunteer pending applications:", err);
         }
       }
       insertBackButton();
