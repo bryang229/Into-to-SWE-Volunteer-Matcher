@@ -7,7 +7,8 @@ const {
     getProfile,
     updateVolunteerData,
     checkUsername,
-    getApplications
+    getApplications,
+    getVolunteerInvites
 } = require('../controllers/volunteerController');
 const {
     verifySession,
@@ -30,6 +31,9 @@ router.get('/check-username', checkUsername);
 router.get("/profile", verifySessionIfAvailable, getProfile);
 //GET /api/volunteers/my-applications
 router.get("/my-applications", verifySession, getApplications);
+//GET /api/volunteers/my-invites
+router.get('/my-invites', verifySession, getVolunteerInvites);
+
 //moved to avoid bugs: it is greedy and takes over routes it's above!
 //GET /api/volunteers/:username_to_lookup 
 router.get('/:username', getVolunteerByUsername);

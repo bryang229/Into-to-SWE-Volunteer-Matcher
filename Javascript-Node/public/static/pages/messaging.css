@@ -119,7 +119,8 @@ body {
     padding: 0.75rem;
     overflow-y: auto;
     background-color: #fff;
-    margin-bottom: 3.5rem;/ ensure space for input */
+    margin-bottom: 3.5rem;
+    /* ensure space for input */
 }
 
 /* Chat input area - sticky at bottom */
@@ -206,6 +207,15 @@ body {
     animation-delay: 0.4s;
 }
 
+.online-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #4CAF50; /* green color */
+    border-radius: 50%;
+    margin-left: 8px;
+    display: inline-block;
+  }
+
 @keyframes blink {
     0% {
         opacity: 0.2;
@@ -237,4 +247,47 @@ body {
     .chat-header h2 {
         font-size: 1rem;
     }
+}
+
+.chat-item {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.chat-item:hover {
+    background-color: #f9f9f9;
+}
+
+.avatar {
+    width: 44px;
+    height: 44px;
+    background-color: #ccc;
+    background-size: cover;
+    border-radius: 50%;
+    margin-right: 0.8rem;
+}
+
+.info {
+    flex: 1;
+}
+
+.name {
+    font-weight: bold;
+    font-size: 1rem;
+    margin-bottom: 2px;
+}
+
+.snippet {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.time {
+    font-size: 0.75rem;
+    color: #999;
+    white-space: nowrap;
 }

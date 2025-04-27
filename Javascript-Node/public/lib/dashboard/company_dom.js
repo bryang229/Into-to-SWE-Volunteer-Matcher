@@ -1,4 +1,4 @@
-import { fetchUserData } from './dashboard_data.js';
+import { fetchUserData, fetchCompanyInvitesSent } from './dashboard_data.js';
 import { setupNav } from '../common/nav_control.js';
 
 let cachedUserData;
@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     populateFields(cachedUserData);
     await loadCompanyListings(cachedUserData.uid);
+    await renderSentInvites();
 
   } catch (err) {
     console.error(err);
@@ -168,5 +169,34 @@ async function loadCompanyListings(companyUid) {
   } catch (err) {
     console.error("Failed to load listings:", err);
     list.innerHTML = "<li>Error loading listings.</li>";
+  }
+}
+
+
+async function renderSentInvites() {
+  const inviteList = document.getElementById('inviteList');
+  if (!inviteList) return;
+
+  try {
+    const invites = await fetchCompanyInvitesSent();
+    if (invites.length === 0) {
+      inviteList.innerHTML = '<p style="text-align:center;">No invites sent yet.</p>';
+      return;
+    }
+
+    invites.forEach(invite => {
+      const card = document.createElement('div');
+      card.className = 'invite-card';
+      card.innerHTML = `
+        <strong>${invite.listingTitle || 'Untitled Listing'}</strong>
+        <p>Status: ${invite.status}</p>
+        <p>Sent to: <a href="/templates/common/profile.html?uid=${invite.volunteerUid}">View Profile</a></p>
+      `;
+      inviteList.appendChild(card);
+    });
+
+  } catch (err) {
+    console.error('Error loading invites:', err);
+    inviteList.innerHTML = '<p style="text-align:center;color:red;">Failed to load invites.</p>';
   }
 }

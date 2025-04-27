@@ -1,112 +1,64 @@
-const { db, admin } = require('../firebase');
+const { admin, db } = require('../firebase');
 
-async function getProfile(req, res) {
-    try {
-        console.log('Getting profile for user:', req.user?.uid);
-        const user = req.user;
-        if (!user) {
-            return res.status(401).json({ error: 'Not authenticated' });
-        }
+// Update account settings (display name, email, password)
+const updateAccountSettings = async (req, res) => {
+  const { newDisplayName, newEmail, currentPassword, newPassword } = req.body;
+  const { uid, accountType } = req.user;
 
-        let userDoc;
-        // Check both collections
-        userDoc = await db.collection('Volunteers').doc(user.uid).get();
-        if (!userDoc.exists) {
-            userDoc = await db.collection('companies').doc(user.uid).get();
-        }
+  try {
+    // Load the user record from Firebase
+    const userRecord = await admin.auth().getUser(uid);
 
-        if (!userDoc.exists) {
-            return res.status(404).json({ error: 'User profile not found' });
-        }
+    const updates = {};
 
-        const userData = userDoc.data();
-        console.log('Found user data:', userData);
-        res.status(200).json({
-            displayName: userData.displayName || userData.companyName,
-            email: userData.email,
-            accountType: userData.accountType || (userDoc.ref.parent.id === 'Volunteers' ? 'volunteer' : 'company')
-        });
-    } catch (error) {
-        console.error('Profile fetch error:', error);
-        res.status(500).json({ error: error.message });
+    if (newDisplayName) {
+      // Update Firestore based on account type
+      const userRef = accountType === "volunteer" ? db.collection('Volunteers').doc(uid) : db.collection('companies').doc(uid);
+      const fieldToUpdate = accountType === "volunteer" ? "fullname" : "companyName";
+
+      await userRef.update({ [fieldToUpdate]: newDisplayName });
+      updates.displayName = newDisplayName;
     }
-}
 
-async function updateProfile(req, res) {
-    try {
-        const user = req.user;
-        const { displayName, email, newPassword } = req.body;
-
-        if (!user) return res.status(401).json({ error: 'Not authenticated' });
-
-        console.log('Updating profile for user:', user.uid);
-
-        // Check if email is already taken
-        if (email && email !== user.email) {
-            console.log('Checking if email is taken:', email);
-            try {
-                const existingUser = await admin.auth().getUserByEmail(email);
-                if (existingUser && existingUser.uid !== user.uid) {
-                    console.log('Email is already taken:', email);
-                    return res.status(400).json({ error: 'Email is already taken' });
-                }
-            } catch (error) {
-                if (error.code !== 'auth/user-not-found') {
-                    console.error('Unexpected error during email check:', error);
-                    throw error;
-                }
-            }
-        }
-
-        // Combine all Firebase Auth updates
-        const authUpdates = {};
-        if (email) authUpdates.email = email;
-        if (newPassword) authUpdates.password = newPassword;
-
-        if (Object.keys(authUpdates).length > 0) {
-            console.log('Updating Firebase Auth for user:', user.uid);
-            await admin.auth().updateUser(user.uid, authUpdates);
-        }
-
-        // Update Firestore profile
-        if (displayName) {
-            console.log('Updating Firestore profile for user:', user.uid);
-            const collection = user.accountType === 'volunteer' ? 'Volunteers' : 'companies';
-            const updateData = user.accountType === 'volunteer' 
-                ? { displayName } 
-                : { companyName: displayName };
-            await db.collection(collection).doc(user.uid).update(updateData);
-        }
-
-        console.log('Profile updated successfully for user:', user.uid);
-        res.status(200).json({ message: 'Profile updated successfully' });
-    } catch (error) {
-        console.error('Error updating profile:', error);
-        res.status(500).json({ error: error.message });
+    if (newEmail) {
+      updates.email = newEmail;
     }
-}
 
-async function deleteAccount(req, res) {
-    try {
-        const user = req.user;
-        if (!user) {
-            return res.status(401).json({ error: 'Not authenticated' });
-        }
-
-        // Delete user data from Firestore
-        await db.collection('Users').doc(user.uid).delete();
-        
-        // Delete user from Firebase Auth
-        await admin.auth().deleteUser(user.uid);
-
-        res.status(200).json({ message: 'Account deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+    if (newPassword) {
+      // Important: You cannot change passwords without reauthentication client-side.
+      // In Admin SDK, if you trust server session, you can directly update.
+      updates.password = newPassword;
     }
-}
+
+    if (Object.keys(updates).length > 0) {
+      await admin.auth().updateUser(uid, updates);
+    }
+
+    res.status(200).json({ message: 'Account updated successfully.' });
+
+  } catch (err) {
+    console.error('Error updating account settings:', err);
+    res.status(500).json({ error: 'Failed to update account.' });
+  }
+};
+
+// Delete account
+const deleteAccount = async (req, res) => {
+  const { uid } = req.user;
+
+  try {
+    await admin.auth().deleteUser(uid);
+    await db.collection('Volunteers').doc(uid).delete().catch(() => {});
+    await db.collection('companies').doc(uid).delete().catch(() => {});
+
+    res.status(200).json({ message: 'Account deleted.' });
+  } catch (err) {
+    console.error('Error deleting account:', err);
+    res.status(500).json({ error: 'Failed to delete account.' });
+  }
+};
 
 module.exports = {
-    getProfile,
-    updateProfile,
-    deleteAccount
+  updateAccountSettings,
+  deleteAccount
 };

@@ -4,36 +4,56 @@
 <head>
     <meta charset="UTF-8">
     <title>Chat</title>
-    <link rel="stylesheet" href="../../static/pages/messaging.css" />
-    <link rel="stylesheet" href="../../static/base.css" />
+    <link rel="stylesheet" href="../../static/base.css">
+    <link rel="stylesheet" href="../../static/pages/messaging.css">
+    <link rel="stylesheet" href="../../static/pages/chat.css">
 </head>
 
 <body>
+    <!-- Navigation Bar -->
     <nav>
-        <div class="nav-title"><a href="/templates/index.html">Volunteer Matcher</a></div>
+        <div class="nav-title">
+            <a href="/templates/index.html">Volunteer Matcher</a>
+        </div>
         <div class="dropdown">
             <button class="dropbtn">Menu ▾</button>
             <div class="dropdown-content" id="navLinks">
-                <!-- JS will populate -->
+                <!-- Links populated by nav_control.js -->
             </div>
         </div>
     </nav>
 
+    <!-- Chat Container -->
     <div class="chat-container">
+
+        <!-- Chat Header -->
         <div class="chat-header">
             <button class="back-btn" id="backToList">← Back</button>
-            <div id="chatHeader">
-              <h2 id="chatPartnerName">Chat</h2>
-              <div id="typingIndicator" style="font-size: 0.85rem; color: #999;"></div>
+            <div id="chatHeader" style="display: flex; flex-direction: column;">
+                <div style="display: flex; align-items: center;">
+                    <h2 id="chatPartnerName" style="cursor:pointer;">
+                        Partner Name
+                        <span id="onlineDot" class="online-dot" style="display: none;"></span>
+                      </h2>
+                </div>
+                <div id="typingIndicator" style="font-size: 0.85rem; color: #999; margin-top: 4px;"></div>
             </div>
-          </div>
-        <div class="chat-messages" id="chatMessages">
-            <!-- Populated by chat.js -->
         </div>
+
+        <!-- Messages Area -->
+        <div class="chat-messages" id="chatMessages">
+            <!-- Messages populated by chat.js -->
+        </div>
+
+        <!-- Chat Input -->
         <div class="chat-input">
-            <textarea id="messageInput" rows="1" placeholder="Type a message..."></textarea>
+            <textarea id="messageInput" placeholder="Type a message..."></textarea>
+            <div id="typingLoader" style="display: none;" class="typing-loader">
+                <span></span><span></span><span></span>
+            </div>
             <button id="sendBtn">Send</button>
         </div>
+
     </div>
 
     <script type="module" src="../../lib/messaging/chat.js"></script>

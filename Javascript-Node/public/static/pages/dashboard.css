@@ -89,11 +89,11 @@
   transition: transform 0.3s ease;
 }
 
-.privacy-toggle input[type="checkbox"]:checked + .toggle-switch::after {
+.privacy-toggle input[type="checkbox"]:checked+.toggle-switch::after {
   transform: translateX(20px);
 }
 
-.privacy-toggle input[type="checkbox"]:checked + .toggle-switch {
+.privacy-toggle input[type="checkbox"]:checked+.toggle-switch {
   background: #4caf50;
 }
 
@@ -129,7 +129,7 @@
   border-top: none;
   border-radius: 0 0 6px 6px;
   z-index: 100;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
   padding: 0.5rem 1rem;
 }
 
@@ -170,7 +170,7 @@
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.tag-multiselect input[type="checkbox"]:checked + .tag {
+.tag-multiselect input[type="checkbox"]:checked+.tag {
   background-color: #1e90ff;
   color: white;
   border-color: #1e90ff;
@@ -203,6 +203,41 @@
   margin-left: 0.5rem;
   display: none;
 }
+
 .status-indicator.updated {
   display: inline;
+}
+
+.dashboard-invites {
+  background: #fff;
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 600px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-invites h3 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.invite-card {
+  background: #c68720;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.invite-card strong {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.invite-card p {
+  margin: 0.25rem 0;
+  color: #666;
+  font-size: 0.95rem;
 }
