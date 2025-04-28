@@ -220,6 +220,18 @@ async function loadVolunteerApplications(user) {
       `;
       list.appendChild(li);
 
+      const card = document.createElement('div');
+      card.className = 'dashboard-card';
+      card.innerHTML = `
+        <h3>${app.listingTitle || 'Untitled Listing'}</h3>
+        <p>Status: ${app.status}</p>
+        <div class="card-buttons">
+          <a class="btn btn-primary" href="/templates/volunteer/view_application.html?applicationId=${app.applicationId}">View Submission</a>
+          <button class="btn btn-danger" onclick="withdrawApplication('${app.applicationId}')">Withdraw</button>
+        </div>
+      `;
+
+      list.appendChild(card);
     } catch (err) {
       console.warn(`Failed to load application ${applicationId}`, err);
     }
@@ -260,5 +272,23 @@ async function renderReceivedInvites() {
   } catch (err) {
     console.error('Error loading invites:', err);
     inviteList.innerHTML = '<p style="text-align:center;color:red;">Failed to load invites.</p>';
+  }
+}
+
+async function withdrawApplication(applicationId) {
+  if (!confirm('Are you sure you want to withdraw this application?')) return;
+
+  try {
+    const res = await fetch(`/api/volunteers/withdraw-application?applicationId=${encodeURIComponent(applicationId)}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+
+    if (!res.ok) throw new Error('Failed to withdraw');
+    alert('Application withdrawn!');
+    window.location.reload();
+  } catch (err) {
+    console.error('Withdraw error:', err);
+    alert('Error withdrawing application');
   }
 }

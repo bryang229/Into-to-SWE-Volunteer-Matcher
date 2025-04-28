@@ -181,7 +181,40 @@ async function getVolunteerInvites(req, res) {
     res.status(500).json({ error: 'Failed to fetch your invites.' });
   }
 }
+const withdrawApplication = async (req, res) => {
+  const { applicationId } = req.query;
+  if (!applicationId) return res.status(400).json({ error: 'Missing applicationId' });
 
+  const volunteerUid = req.user.uid;
+
+  try {
+    const appSnap = await db.collection('Applications').doc(applicationId).get();
+    if (!appSnap.exists) return res.status(404).json({ error: 'Application not found' });
+
+    const appData = appSnap.data();
+    if (appData.volunteerUid !== volunteerUid) {
+      return res.status(403).json({ error: 'Unauthorized: Not your application' });
+    }
+
+    // Remove application document
+    await db.collection('Applications').doc(applicationId).delete();
+
+    // Remove reference from Volunteer profile
+    const volunteerRef = db.collection('Volunteers').doc(volunteerUid);
+    await volunteerRef.update({
+      applications: admin.firestore.FieldValue.arrayRemove({
+        applicationId: applicationId,
+        listingId: appData.listingId
+      })
+    });
+
+    res.json({ message: 'Application withdrawn successfully' });
+
+  } catch (err) {
+    console.error('Error withdrawing application:', err);
+    res.status(500).json({ error: 'Failed to withdraw application' });
+  }
+};
 
 //Export functions so they can be used in routers to link the function to the route!
 module.exports = {
@@ -192,5 +225,6 @@ module.exports = {
   getVolunteerByUsername,
   checkUsername,
   getVolunteerInvites,
-  getApplications
+  getApplications,
+  withdrawApplication
 };

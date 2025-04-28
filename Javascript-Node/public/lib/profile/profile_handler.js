@@ -28,7 +28,7 @@ export function renderVolunteerProfile(data, applications = [], invites = [], li
             card.innerHTML = `
               <div><strong>${app.listingTitle || 'Untitled Listing'}</strong></div>
               <div>Status: ${app.status}</div>
-              <a href="/templates/company/application_review.html?applicationId=${app.applicationId}">Review Application</a>
+              <a href="/templates/company/applicant_review.html?applicationId=${app.applicationId}">Review Application</a>
             `;
             appsSection.appendChild(card);
         });

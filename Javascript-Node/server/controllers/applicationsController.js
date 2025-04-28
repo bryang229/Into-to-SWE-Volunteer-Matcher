@@ -194,6 +194,32 @@ const revealInfo = async (req, res) => {
   res.status(200).json({ message: "Info revealed successfully." });
 };
 
+async function getApplicationCountsForCompany(req, res) {
+  const companyUid = req.user.uid;
+
+  try {
+    const listingsSnap = await db.collection('Listings')
+      .where('creatorUid', '==', companyUid)
+      .get();
+
+    if (listingsSnap.empty) return res.json([]);
+
+    const counts = [];
+
+    for (const listing of listingsSnap.docs) {
+      const listingId = listing.id;
+      const appsSnap = await db.collection('Applications')
+        .where('listingId', '==', listingId)
+        .get();
+      counts.push({ listingId, count: appsSnap.size });
+    }
+
+    res.json(counts);
+  } catch (err) {
+    console.error('Error fetching application counts:', err);
+    res.status(500).json({ error: 'Failed to fetch application counts' });
+  }
+}
 
 module.exports = {
   apply,
@@ -202,5 +228,6 @@ module.exports = {
   getApplicants,
   requestAccess,
   updateStatus,
-  revealInfo
+  revealInfo,
+  getApplicationCountsForCompany
 }

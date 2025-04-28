@@ -7,7 +7,8 @@ const {
     getApplicants,
     requestAccess,
     updateStatus,
-    revealInfo
+    revealInfo,
+    getApplicationCountsForCompany
 } = require('../controllers/applicationsController');
 const { verifySession } = require("../controllers/authController")
 //Returns all listings
@@ -25,6 +26,7 @@ router.post("/request-access", verifySession, requestAccess);
 router.patch("/status", verifySession, updateStatus);
 //POST /api/applications/reveal-info
 router.post("/reveal-info", verifySession, revealInfo);
-
+//GET /api/applications/counts-for-company
+router.get('/counts-for-company', verifySession, getApplicationCountsForCompany);
 
 module.exports = router;

@@ -137,8 +137,13 @@ async function loadCompanyListings(companyUid) {
   list.innerHTML = "";
 
   try {
-    const res = await fetch("/api/listings/");
-    const listings = await res.json();
+    const listingsRes = await fetch("/api/listings/");
+    const listings = await listingsRes.json();
+
+    const countsRes = await fetch("/api/applications/counts-for-company", { credentials: 'include' });
+    const counts = await countsRes.json();
+    const countsMap = {};
+    counts.forEach(c => { countsMap[c.listingId] = c.count; });
 
     const companyListings = listings.filter(l => l.creatorUid === companyUid);
 
@@ -148,26 +153,58 @@ async function loadCompanyListings(companyUid) {
     }
 
     companyListings.forEach(listing => {
-      const li = document.createElement("li");
-      li.className = "listing-entry";
-      li.innerHTML = `
-        <h4>${listing.title}</h4>
-        <p><strong>Date:</strong> ${listing.date}</p>
-        <p><strong>Location:</strong> ${listing.location}</p>
-        <p>${listing.description}</p>
+      const card = document.createElement('div');
+      card.className = 'dashboard-card';
+      card.innerHTML = `
+        <h3>${listing.title || 'Untitled Listing'}</h3>
+        <p><strong>Date:</strong> ${listing.date || 'N/A'}</p>
+        <p><strong>Location:</strong> ${listing.location || 'N/A'}</p>
+        <p><strong>Applications:</strong> ${countsMap[listing.id] || 0}</p>
+        <div class="card-buttons">
         <button class="view-applicants-btn" data-id="${listing.id}">View Applicants</button>
+        <a class="btn btn-primary" href="/templates/company/applicants.html?listingId=${listing.id}">Manage Applicants</a>
+          <a class="btn btn-primary" href="/templates/company/applicants.html?listingId=${listing.id}">Manage Applicants</a>
+          <button class="btn btn-danger" data-id="${listing.id}">Delete Listing</button>
+        </div>
       `;
-      list.appendChild(li);
+      list.appendChild(card);
     });
 
+    // Attach "View Applicants" button behavior
     document.querySelectorAll(".view-applicants-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const listingId = btn.dataset.id;
+      btn.addEventListener("click", (e) => {
+        const listingId = e.target.dataset.id;
+        if (!listingId) return;
         window.location.href = `/templates/company/applicants.html?listingId=${listingId}`;
       });
     });
+
+    // Reattach delete event listeners
+    document.querySelectorAll(".btn-danger[data-id]").forEach(btn => {
+      btn.addEventListener("click", async (e) => {
+        const id = e.target.getAttribute('data-id');
+        if (!id) return;
+
+        if (!confirm('Are you sure you want to delete this listing?')) return;
+
+        try {
+          const res = await fetch(`/api/companies/delete-listing?listingId=${encodeURIComponent(id)}`, {
+            method: 'DELETE',
+            credentials: 'include'
+          });
+
+          if (!res.ok) throw new Error('Failed to delete');
+          alert('Listing deleted successfully');
+          window.location.reload();
+        } catch (err) {
+          console.error('Delete listing error:', err);
+          alert('Error deleting listing');
+        }
+      });
+    });
+
   } catch (err) {
-    console.error("Failed to load listings:", err);
+    console.error("Failed to load listings or applications:", err);
     list.innerHTML = "<li>Error loading listings.</li>";
   }
 }
@@ -198,5 +235,23 @@ async function renderSentInvites() {
   } catch (err) {
     console.error('Error loading invites:', err);
     inviteList.innerHTML = '<p style="text-align:center;color:red;">Failed to load invites.</p>';
+  }
+}
+
+async function deleteListing(listingId) {
+  if (!confirm('Are you sure you want to delete this listing? This will also remove related applications and invites.')) return;
+
+  try {
+    const res = await fetch(`/api/companies/delete-listing?listingId=${encodeURIComponent(listingId)}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+
+    if (!res.ok) throw new Error('Failed to delete');
+    alert('Listing deleted successfully');
+    window.location.reload();
+  } catch (err) {
+    console.error('Delete listing error:', err);
+    alert('Error deleting listing');
   }
 }

@@ -111,6 +111,44 @@ async function inviteVolunteer(req, res) {
   }
 }
 
+const deleteListing = async (req, res) => {
+  const { listingId } = req.query;
+  if (!listingId) return res.status(400).json({ error: 'Missing listingId' });
+
+  const companyUid = req.user.uid;
+
+  try {
+    const listingSnap = await db.collection('Listings').doc(listingId).get();
+    if (!listingSnap.exists) return res.status(404).json({ error: 'Listing not found' });
+
+    const listingData = listingSnap.data();
+    if (listingData.creatorUid !== companyUid) {
+      return res.status(403).json({ error: 'Unauthorized: Not your listing' });
+    }
+
+    const batch = db.batch();
+
+    // Delete the listing
+    batch.delete(db.collection('Listings').doc(listingId));
+
+    // Delete applications tied to this listing
+    const appsSnap = await db.collection('Applications').where('listingId', '==', listingId).get();
+    appsSnap.forEach(doc => batch.delete(doc.ref));
+
+    // Delete invites tied to this listing
+    const invitesSnap = await db.collection('VolunteerInvitations').where('listingId', '==', listingId).get();
+    invitesSnap.forEach(doc => batch.delete(doc.ref));
+
+    await batch.commit();
+
+    res.json({ message: 'Listing and related data deleted' });
+
+  } catch (err) {
+    console.error('Error deleting listing:', err);
+    res.status(500).json({ error: 'Failed to delete listing' });
+  }
+};
+
 // Fetch all invites this company has sent
 async function getCompanyInvitesSent(req, res) {
   const companyUid = req.user?.uid;
@@ -240,5 +278,6 @@ module.exports = {
   inviteVolunteer,
   getCompanyInvitesSent,
   getInvitesForVolunteer,
+  deleteListing,
   checkUsername
 };
