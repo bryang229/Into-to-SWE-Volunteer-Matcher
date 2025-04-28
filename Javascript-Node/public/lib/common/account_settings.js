@@ -1,29 +1,12 @@
-import { setupNav } from '../common/nav_control.js';
+import { setupNav } from '../common/nav_control.js'; 
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await setupNav();
+    setupNav(); // If you have dynamic nav bar loading
 
-    // Fetch current user data and populate display name
-    try {
-        const response = await fetch('/api/me', {
-            credentials: 'include'
-        });
-        if (!response.ok) throw new Error('Failed to fetch user data');
-        const userData = await response.json();
-        
-        const displayNameInput = document.getElementById('newDisplayName');
-        if (displayNameInput && userData.username) {
-            displayNameInput.value = userData.username;
-        }
-    } catch (error) {
-        console.error('Error fetching user data:', error);
-    }
+    await loadUserData();
 
+    // Handle Display Name Update
     const displayNameForm = document.getElementById('displayNameForm');
-    const emailForm = document.getElementById('emailForm');
-    const passwordForm = document.getElementById('passwordForm');
-    const deleteAccountBtn = document.getElementById('deleteAccountBtn');
-
     if (displayNameForm) {
         displayNameForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -32,7 +15,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 alert('Please enter a valid name.');
                 return;
             }
-
             try {
                 const res = await fetch('/api/volunteers/update', {
                     method: 'POST',
@@ -41,16 +23,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                     body: JSON.stringify({ username: newName })
                 });
 
-                if (!res.ok) throw new Error('Failed to update');
+                if (!res.ok) throw new Error('Failed to update display name.');
                 alert('Display name updated successfully!');
                 window.location.reload();
-            } catch (err) {
-                console.error('Display name update error:', err);
-                alert('Update failed. Please try again.');
+            } catch (error) {
+                console.error('Error updating display name:', error);
+                alert('Failed to update display name.');
             }
         });
     }
 
+    // Handle Email Update
+    const emailForm = document.getElementById('emailForm');
     if (emailForm) {
         emailForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -59,50 +43,73 @@ document.addEventListener('DOMContentLoaded', async () => {
                 alert('Please enter a valid email.');
                 return;
             }
-
             try {
                 const res = await fetch('/api/volunteers/update', {
-                    method: 'POST', 
+                    method: 'POST',
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: newEmail })
                 });
 
-                if (!res.ok) throw new Error('Failed to update');
-                alert('Email updated successfully!');
-                window.location.reload();
-            } catch (err) {
-                console.error('Email update error:', err);
-                alert('Update failed. Please try again.');
+                if (!res.ok) throw new Error('Failed to update email.');
+                
+                alert('Email updated successfully! Please log in again.');
+                await logoutAndRedirect();
+            } catch (error) {
+                console.error('Error updating email:', error);
+                alert('Failed to update email: ' + error.message);
             }
         });
     }
 
-    if (passwordForm) {
-        passwordForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            alert('Password updates are not yet available. Coming soon!');
-        });
-    }
-
+    // Delete Account
+    const deleteAccountBtn = document.getElementById('deleteAccountBtn');
     if (deleteAccountBtn) {
         deleteAccountBtn.addEventListener('click', async () => {
-            const confirmDelete = confirm('Are you sure you want to delete your account? This action cannot be undone.');
-            if (!confirmDelete) return;
-
+            if (!confirm('Are you sure you want to delete your account? This action cannot be undone.')) return;
             try {
-                const res = await fetch('/api/users/delete-account', {
+                const res = await fetch('/api/user/delete', {
                     method: 'DELETE',
                     credentials: 'include'
                 });
 
-                if (!res.ok) throw new Error('Failed to delete account');
+                if (!res.ok) throw new Error('Failed to delete account.');
+                
                 alert('Account deleted successfully.');
-                window.location.href = '/templates/index.html';
-            } catch (err) {
-                console.error('Account deletion error:', err);
-                alert('Failed to delete account. Please try again.');
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Error deleting account:', error);
+                alert('Failed to delete account: ' + error.message);
             }
         });
     }
 });
+
+// Function to load user data
+async function loadUserData() {
+    try {
+        const res = await fetch('/api/me', { credentials: 'include' });
+        if (!res.ok) throw new Error('Failed to fetch user data.');
+        const userData = await res.json();
+        if (userData.username) document.getElementById('newDisplayName').value = userData.username;
+        if (userData.email) document.getElementById('newEmail').value = userData.email;
+    } catch (error) {
+        console.error('Error loading user data:', error);
+        alert('Error loading your account information.');
+    }
+}
+
+// Helper to log out user and redirect to login
+async function logoutAndRedirect() {
+    try {
+        const res = await fetch('/api/logout', {
+            method: 'POST',
+            credentials: 'include'
+        });
+        if (!res.ok) throw new Error('Logout failed.');
+    } catch (error) {
+        console.error('Logout error:', error);
+    } finally {
+        window.location.href = '/templates/auth/login.html'; // Adjust path if needed
+    }
+}
