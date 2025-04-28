@@ -3,6 +3,22 @@ import { setupNav } from '../common/nav_control.js';
 document.addEventListener('DOMContentLoaded', async () => {
     await setupNav();
 
+    // Fetch current user data and populate display name
+    try {
+        const response = await fetch('/api/me', {
+            credentials: 'include'
+        });
+        if (!response.ok) throw new Error('Failed to fetch user data');
+        const userData = await response.json();
+        
+        const displayNameInput = document.getElementById('newDisplayName');
+        if (displayNameInput && userData.username) {
+            displayNameInput.value = userData.username;
+        }
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+    }
+
     const displayNameForm = document.getElementById('displayNameForm');
     const emailForm = document.getElementById('emailForm');
     const passwordForm = document.getElementById('passwordForm');
@@ -18,11 +34,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             try {
-                const res = await fetch('/api/users/update', {
-                    method: 'PATCH',
+                const res = await fetch('/api/volunteers/update', {
+                    method: 'POST',
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fullname: newName, companyName: newName })
+                    body: JSON.stringify({ username: newName })
                 });
 
                 if (!res.ok) throw new Error('Failed to update');
@@ -45,8 +61,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             try {
-                const res = await fetch('/api/users/update', {
-                    method: 'PATCH',
+                const res = await fetch('/api/volunteers/update', {
+                    method: 'POST', 
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: newEmail })
