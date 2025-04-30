@@ -29,7 +29,7 @@ export function renderPopUpListing(listing_data, accountType) {
       <h2>${listing_data.title}</h2>
       <p><strong>Location:</strong> ${listing_data.location}</p>
       <p><strong>Date:</strong> ${listing_data.date}</p>
-      <p><strong>Company:</strong> ${listing_data.companyName}</p>
+      <p> <a href="/templates/common/profile.html?uid=${listing_data.creatorUid}" style="color: #000000;"><strong> Company:  ${listing_data.companyName}</strong></a></p>
       <p><strong>Description:</strong> ${listing_data.description}</p>
       <p><strong>Tags:</strong> ${listing_data.tags.join(", ")}</p>
  ${accountType === "volunteer"
